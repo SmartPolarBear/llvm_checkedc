@@ -15,9 +15,15 @@ add_definitions(${LLVM_DEFINITIONS_LIST})
 
 add_executable(bslang main.cpp)
 
+add_subdirectory(libs)
+
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-# Link against LLVM libraries
-target_link_libraries(bslang ${llvm_libs})
+# Link against libraries
+target_link_libraries(bslang
+        ${llvm_libs}
+        GSL
+        argparse
+        magic_enum)
