@@ -13,7 +13,18 @@ include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 
-add_executable(bslang main.cpp)
+add_executable(chclang main.cpp)
+
+target_include_directories(chclang
+        PRIVATE include)
+
+# Use libc++ instead of libstdc++
+target_compile_options(chclang
+        PRIVATE -stdlib=libc++)
+
+target_link_options(chclang
+        PRIVATE -stdlib=libc++
+        PRIVATE -lc++abi)
 
 add_subdirectory(libs)
 
@@ -22,8 +33,9 @@ add_subdirectory(libs)
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against libraries
-target_link_libraries(bslang
+target_link_libraries(chclang
         ${llvm_libs}
         GSL
         argparse
-        magic_enum)
+        magic_enum
+        fmt::fmt)
