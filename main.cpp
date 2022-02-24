@@ -21,6 +21,11 @@ int main(int argc, char* argv[])
 			.nargs(predefined_configurations::MAX_FILES)
 			.required();
 
+	program.add_argument("--dump-ir")
+			.help("Print llvm IR")
+			.default_value(false)
+			.implicit_value(false);
+
 	program.add_argument("-o", "--output")
 			.nargs(1)
 			.required()

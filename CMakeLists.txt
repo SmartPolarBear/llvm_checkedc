@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(llvm_basic)
+project(llvm_checkedc)
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -39,3 +39,6 @@ target_link_libraries(chclang
         argparse
         magic_enum
         fmt::fmt)
+
+add_subdirectory(base)
+add_subdirectory(scanner)
