@@ -11,48 +11,74 @@
 //
 
 //
-// Created by cleve on 2/24/2022.
+// Created by cleve on 2/26/2022.
 //
 
 #pragma once
 
-#include "scanner/token.h"
-
-#include <fstream>
-#include <string>
-#include <queue>
-
-#include <gsl/gsl>
+#include "scanner/token_type.h"
 
 namespace chclang::scanning
 {
-class scanner
+
+struct empty_literal_tag
+{
+};
+
+using integer_literal_type = long long;
+using floating_literal_type = long double;
+using string_literal_type = std::string;
+using boolean_literal_type = bool;
+
+using literal_value_type = std::variant<empty_literal_tag,
+		integer_literal_type,
+		floating_literal_type,
+		string_literal_type,
+		boolean_literal_type>;
+
+
+class token final
 {
 public:
-	explicit scanner(std::string source);
+	static inline constexpr empty_literal_tag empty_literal;
 
-
-private:
-	[[nodiscard]] static inline bool is_digit(char c);
-
-	[[nodiscard]] static inline bool is_letter(char c);
-
-	[[nodiscard]] inline bool is_end() const noexcept
+	[[nodiscard]] explicit token(token_type t, std::string lexeme, literal_value_type lit, size_t line)
+			: type_(t), lexeme_(std::move(lexeme)), literal_(std::move(lit)), line_(line)
 	{
-		return cur_ >= src_.size();
 	}
 
-	char advance();
+	~token() = default;
 
-	[[nodiscard]] char peek(size_t n = 0);
+	token(const token&) = default;
 
-	[[nodiscard]] bool match(char expect);
+	token(token&&) = default;
 
-	[[nodiscard]] std::string lexeme();
+	token& operator=(const token&) = default;
 
-	std::string src_path_{};
+	[[nodiscard]]token_type type() const
+	{
+		return type_;
+	}
 
-	std::string src_{};
-	gsl::index cur_{ 0 }, start_{ 0 };
+	[[nodiscard]]std::string lexeme() const
+	{
+		return lexeme_;
+	}
+
+	[[nodiscard]] literal_value_type literal() const
+	{
+		return literal_;
+	}
+
+	[[nodiscard]] size_t line() const
+	{
+		return line_;
+	}
+
+private:
+	token_type type_;
+	std::string lexeme_;
+	literal_value_type literal_;
+	size_t line_;
 };
 }

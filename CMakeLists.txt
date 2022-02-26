@@ -38,7 +38,7 @@ target_link_libraries(chclang
         GSL
         argparse
         magic_enum
-        fmt::fmt)
+        fmt::fmt-header-only)
 
 add_subdirectory(base)
 add_subdirectory(scanner)

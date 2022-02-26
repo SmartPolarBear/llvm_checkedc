@@ -11,48 +11,45 @@
 //
 
 //
-// Created by cleve on 2/24/2022.
+// Created by cleve on 2/26/2022.
 //
+
 
 #pragma once
 
-#include "scanner/token.h"
-
-#include <fstream>
-#include <string>
-#include <queue>
-
-#include <gsl/gsl>
-
 namespace chclang::scanning
 {
-class scanner
+enum class token_type
 {
-public:
-	explicit scanner(std::string source);
+	// Single-character tokens.
+	LEFT_PAREN, RIGHT_PAREN, LEFT_BRACKET /* [ */, RIGHT_BRACKET, LEFT_BRACE /* { */, RIGHT_BRACE,
+	COMMA, DOT,
+	SEMICOLON, COLON /* : */, SLASH,
+	QMARK /* ? */,
 
+	// One or two character tokens.
+	BANG, BANG_EQUAL,
+	EQUAL, EQUAL_EQUAL,
+	GREATER, GREATER_EQUAL,
+	LESS, LESS_EQUAL,
+	MINUS, MINUS_MINUS,
+	PLUS, PLUS_PLUS,
+	STAR,
+	BITWISE_AND, BITWISE_OR, BITWISE_XOR, BITWISE_NOT,
 
-private:
-	[[nodiscard]] static inline bool is_digit(char c);
+	// Two character tokens
+	ARROW, /* -> */
+	AND, OR,
 
-	[[nodiscard]] static inline bool is_letter(char c);
+	// Literals.
+	IDENTIFIER, STRING,
+	INTEGER, FLOATING,
 
-	[[nodiscard]] inline bool is_end() const noexcept
-	{
-		return cur_ >= src_.size();
-	}
+	// Keywords.
+	STRUCT, ENUM, ELSE, FALSE, VOID, FOR, IF,
+	RETURN, THIS, TRUE, WHILE, DO,
+	SIZEOF,
 
-	char advance();
-
-	[[nodiscard]] char peek(size_t n = 0);
-
-	[[nodiscard]] bool match(char expect);
-
-	[[nodiscard]] std::string lexeme();
-
-	std::string src_path_{};
-
-	std::string src_{};
-	gsl::index cur_{ 0 }, start_{ 0 };
+	END_OF_FILE,
 };
 }

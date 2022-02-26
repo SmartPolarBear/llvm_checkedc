@@ -50,3 +50,30 @@ chclang::scanning::scanner::scanner(std::string source)
 
 	src_ = ss.str();
 }
+
+char chclang::scanning::scanner::advance()
+{
+	return src_.at(cur_++);
+}
+
+char chclang::scanning::scanner::peek(size_t n)
+{
+	if (is_end())return 0;
+	if (cur_ + n >= src_.size())return 0;
+
+	return src_.at(cur_ + n);
+}
+
+bool chclang::scanning::scanner::match(char expect)
+{
+	if (is_end())return false;
+	if (src_.at(cur_) != expect)return false;
+
+	cur_++;
+	return true;
+}
+
+std::string chclang::scanning::scanner::lexeme()
+{
+	return src_.substr(start_, cur_ - start_);
+}
