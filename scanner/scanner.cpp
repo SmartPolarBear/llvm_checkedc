@@ -14,9 +14,14 @@
 // Created by cleve on 2/24/2022.
 //
 
+#include "base/exceptions.h"
 #include "scanner/scanner.h"
 
 #include <cctype>
+#include <sstream>
+
+using namespace std;
+using namespace chclang::exceptions;
 
 bool chclang::scanning::scanner::is_digit(char c)
 {
@@ -31,12 +36,17 @@ bool chclang::scanning::scanner::is_letter(char c)
 }
 
 chclang::scanning::scanner::scanner(std::string source)
-		: src_(std::move(source)), input_(source, std::ios::in)
+		: src_path_(std::move(source))
 {
-	if (!input_.is_open())
+	std::ifstream input{ src_path_, std::ios::in };
+
+	if (!input.is_open())
 	{
-		throw;
+		throw file_operation_error{ src_path_ };
 	}
 
+	stringstream ss{};
+	ss << input.rdbuf();
 
+	src_ = ss.str();
 }

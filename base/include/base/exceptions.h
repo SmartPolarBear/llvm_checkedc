@@ -13,8 +13,26 @@
 //
 // Created by cleve on 2/24/2022.
 //
+#pragma once
 
-#ifndef LLVM_CHECKEDC_EXCEPTIONS_H
-#define LLVM_CHECKEDC_EXCEPTIONS_H
+#include <exception>
+#include <stdexcept>
+#include <string>
 
-#endif //LLVM_CHECKEDC_EXCEPTIONS_H
+#include <fmt/format.h>
+
+namespace chclang::exceptions
+{
+class file_operation_error
+		: public std::runtime_error
+{
+public:
+	explicit file_operation_error(const std::string& filename)
+			: filename_(filename), std::runtime_error(fmt::format("{} file error", filename))
+	{
+	}
+
+private:
+	std::string filename_{};
+};
+}

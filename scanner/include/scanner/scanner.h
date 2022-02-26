@@ -18,6 +18,9 @@
 
 #include <fstream>
 #include <string>
+#include <queue>
+
+#include <gsl/gsl>
 
 namespace chclang::scanning
 {
@@ -31,8 +34,9 @@ private:
 
 	static inline bool is_letter(char c);
 
-	std::string src_{};
+	std::string src_path_{};
 
-	std::ifstream input_{};
+	std::string src_{};
+	gsl::index cur_{0};
 };
 }
