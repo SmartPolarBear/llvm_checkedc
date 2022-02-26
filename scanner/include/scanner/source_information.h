@@ -13,77 +13,30 @@
 //
 // Created by cleve on 2/26/2022.
 //
-
 #pragma once
 
-#include "scanner/token_type.h"
-#include "scanner/source_information.h"
-
-#include <optional>
+#include <string>
 
 namespace chclang::scanning
 {
-
-
-using integer_literal_type = long long;
-using floating_literal_type = long double;
-using string_literal_type = std::string;
-using boolean_literal_type = bool;
-
-using literal_value_type = std::variant<
-		integer_literal_type,
-		floating_literal_type,
-		string_literal_type,
-		boolean_literal_type>;
-
-
-class token final
+class source_information final
 {
 public:
-
-	[[nodiscard]] explicit token(token_type t,
-			std::string lexeme,
-			std::optional<literal_value_type> lit,
-			source_information src_info)
-			: type_(t),
-			  lexeme_(std::move(lexeme)),
-			  literal_(std::move(lit)),
-			  source_info_(std::move(src_info))
+	explicit source_information(size_t line, std::string filename = "")
+			: line_(line), file_name_(std::move(filename))
 	{
 	}
 
-	~token() = default;
+	~source_information() = default;
 
-	token(const token&) = default;
+	source_information(const source_information&) = default;
 
-	token(token&&) = default;
+	source_information(source_information&&) = default;
 
-	token& operator=(const token&) = default;
-
-	[[nodiscard]]token_type type() const
-	{
-		return type_;
-	}
-
-	[[nodiscard]]std::string lexeme() const
-	{
-		return lexeme_;
-	}
-
-	[[nodiscard]] std::optional<literal_value_type> literal() const
-	{
-		return literal_;
-	}
-
-	[[nodiscard]] source_information source_info() const
-	{
-		return source_info_;
-	}
+	source_information& operator=(const source_information&) = default;
 
 private:
-	token_type type_;
-	std::string lexeme_;
-	std::optional<literal_value_type> literal_;
-	source_information source_info_;
+	std::string file_name_{};
+	size_t line_{};
 };
 }
