@@ -22,8 +22,8 @@ namespace chclang::scanning
 class source_information final
 {
 public:
-	explicit source_information(size_t line, std::string filename = "")
-			: line_(line), file_name_(std::move(filename))
+	explicit source_information(size_t line, size_t col, std::string filename = "")
+			: line_(line), column_(col), file_name_(std::move(filename))
 	{
 	}
 
@@ -38,5 +38,6 @@ public:
 private:
 	std::string file_name_{};
 	size_t line_{};
+	size_t column_{};
 };
 }

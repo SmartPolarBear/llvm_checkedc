@@ -21,6 +21,7 @@
 #include <fstream>
 #include <string>
 #include <queue>
+#include <vector>
 
 #include <gsl/gsl>
 
@@ -31,7 +32,7 @@ class scanner
 public:
 	explicit scanner(std::string source);
 
-
+	std::vector<token> scan();
 private:
 	[[nodiscard]] static inline bool is_digit(char c);
 
@@ -42,6 +43,8 @@ private:
 		return cur_ >= src_.size();
 	}
 
+	void add_token(token_type type, std::optional<literal_value_type> lit = std::nullopt);
+
 	char advance();
 
 	[[nodiscard]] char peek(size_t n = 0);
@@ -50,9 +53,15 @@ private:
 
 	[[nodiscard]] std::string lexeme();
 
+	void scan_next_token();
+
+	std::vector<token> tokens_{};
+
 	std::string src_path_{};
 
 	std::string src_{};
 	gsl::index cur_{ 0 }, start_{ 0 };
+
+	size_t line_{}, col_{};
 };
 }

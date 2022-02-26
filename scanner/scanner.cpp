@@ -53,7 +53,16 @@ chclang::scanning::scanner::scanner(std::string source)
 
 char chclang::scanning::scanner::advance()
 {
-	return src_.at(cur_++);
+	auto ret = src_.at(cur_++);
+	if (ret != '\n')
+	{
+		col_++;
+	}
+	else
+	{
+		col_ = 0;
+	}
+	return ret;
 }
 
 char chclang::scanning::scanner::peek(size_t n)
@@ -69,6 +78,14 @@ bool chclang::scanning::scanner::match(char expect)
 	if (is_end())return false;
 	if (src_.at(cur_) != expect)return false;
 
+	if (src_.at(cur_) != '\n')
+	{
+		col_++;
+	}
+	else
+	{
+		col_ = 0;
+	}
 	cur_++;
 	return true;
 }
@@ -76,4 +93,32 @@ bool chclang::scanning::scanner::match(char expect)
 std::string chclang::scanning::scanner::lexeme()
 {
 	return src_.substr(start_, cur_ - start_);
+}
+
+void chclang::scanning::scanner::add_token(chclang::scanning::token_type type, optional<literal_value_type> lit)
+{
+	source_information src_info{ line_, col_ };
+	tokens_.emplace_back(type, lexeme(), lit, src_info);
+}
+
+vector<chclang::scanning::token> chclang::scanning::scanner::scan()
+{
+	while (!is_end())
+	{
+		start_ = cur_;
+		scan_next_token();
+	}
+
+	add_token(token_type::END_OF_FILE);
+	return tokens_;
+}
+
+void chclang::scanning::scanner::scan_next_token()
+{
+	char c = advance();
+	switch (c)
+	{
+	case '(':
+		break;
+	}
 }
