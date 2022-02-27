@@ -119,6 +119,132 @@ void chclang::scanning::scanner::scan_next_token()
 	switch (c)
 	{
 	case '(':
+		add_token(token_type::LEFT_PAREN);
+		break;
+	case ')':
+		add_token(token_type::RIGHT_PAREN);
+		break;
+	case '[':
+		add_token(token_type::LEFT_BRACKET);
+		break;
+	case ']':
+		add_token(token_type::RIGHT_BRACKET);
+		break;
+	case '{':
+		add_token(token_type::LEFT_BRACE);
+		break;
+	case '}':
+		add_token(token_type::RIGHT_BRACE);
+		break;
+	case ',':
+		add_token(token_type::COMMA);
+		break;
+	case '.':
+		add_token(token_type::DOT);
+		break;
+	case '-':
+		if (match('-'))
+		{
+			add_token(token_type::MINUS_MINUS);
+		}
+		else if (match('>'))
+		{
+			add_token(token_type::ARROW);
+		}
+		else
+		{
+			add_token(token_type::MINUS);
+		}
+		break;
+	case '+':
+		if (match('+'))
+		{
+			add_token(token_type::PLUS_PLUS);
+		}
+		else
+		{
+			add_token(token_type::PLUS);
+		}
+		break;
+	case ';':
+		add_token(token_type::SEMICOLON);
+		break;
+	case '*':
+		if (match('*'))
+		{
+			add_token(token_type::STAR);
+		}
+		else
+		{
+			add_token(token_type::STAR);
+		}
+		break;
+	case '?':
+		add_token(token_type::QMARK);
+		break;
+	case '|':
+		add_token(token_type::PIPE);
+		break;
+	case ':':
+		add_token(token_type::COLON);
+		break;
+
+	case '!':
+		add_token(match('=') ? token_type::BANG_EQUAL : token_type::BANG);
+		break;
+	case '=':
+		add_token(match('=') ? token_type::EQUAL_EQUAL : token_type::EQUAL);
+		break;
+	case '<':
+		add_token(match('=') ? token_type::LESS_EQUAL : token_type::LESS);
+		break;
+	case '>':
+		add_token(match('=') ? token_type::GREATER_EQUAL : token_type::GREATER);
+		break;
+
+	case '/':
+		if (match('/')) // this is a line comment
+		{
+			consume_line_comment();
+		}
+		else if (match('*')) // this is a block comment
+		{
+			consume_block_comment();
+		}
+		else
+		{
+			add_token(token_type::SLASH);
+		}
+		break;
+
+	case ' ':
+	case '\r':
+	case '\t':
+		// Do nothing to ignore whitespaces.
+		break;
+
+	case '\n':
+		line_++;
+		break;
+
+	case '"':
+		scan_string();
+		break;
+
+	default:
+		if (validator::valid_number_literal_component(c))
+		{
+			scan_number_literal();
+		}
+		else if (validator::valid_identifier_component(c))
+		{
+			scan_identifier();
+		}
+		else
+		{
+			logging::logger::instance().error(line_, format("Unexpected character {}.", c));
+		}
+
 		break;
 	}
 }
