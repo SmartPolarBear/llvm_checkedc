@@ -11,60 +11,33 @@
 //
 
 //
-// Created by cleve on 2/24/2022.
+// Created by cleve on 2/28/2022.
 //
 
 #pragma once
 
-#include "scanner/token.h"
-
-#include <fstream>
-#include <string>
-#include <queue>
-#include <vector>
-
-#include <gsl/gsl>
-
-namespace chclang::scanning
+namespace chclang::base
 {
-class scanner
+template<typename T>
+class singleton
 {
 public:
-	explicit scanner(std::string source);
+	static T& instance();
 
-	std::vector<token> scan();
-private:
-	void consume_line_comment();
-	void consume_block_comment();
+	singleton(const singleton&) = delete;
 
-	[[nodiscard]] static inline bool is_digit(char c);
+	singleton& operator=(const singleton&) = delete;
 
-	[[nodiscard]] static inline bool is_letter(char c);
-
-	[[nodiscard]] inline bool is_end() const noexcept
+protected:
+	singleton()
 	{
-		return cur_ >= src_.size();
 	}
-
-	void add_token(token_type type, std::optional<literal_value_type> lit = std::nullopt);
-
-	char advance();
-
-	[[nodiscard]] char peek(size_t n = 0);
-
-	[[nodiscard]] bool match(char expect);
-
-	[[nodiscard]] std::string lexeme();
-
-	void scan_next_token();
-
-	std::vector<token> tokens_{};
-
-	std::string src_path_{};
-
-	std::string src_{};
-	gsl::index cur_{ 0 }, start_{ 0 };
-
-	size_t line_{}, col_{};
 };
+
+template<typename T>
+T& singleton<T>::instance()
+{
+	static T inst{};
+	return inst;
+}
 }

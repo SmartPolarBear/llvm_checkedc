@@ -170,20 +170,36 @@ void chclang::scanning::scanner::scan_next_token()
 		add_token(token_type::SEMICOLON);
 		break;
 	case '*':
-		if (match('*'))
-		{
-			add_token(token_type::STAR);
-		}
-		else
-		{
-			add_token(token_type::STAR);
-		}
+		add_token(token_type::STAR);
 		break;
 	case '?':
 		add_token(token_type::QMARK);
 		break;
+	case '^':
+		add_token(token_type::BITWISE_XOR);
+		break;
+	case '~':
+		add_token(token_type::BITWISE_NOT);
+		break;
 	case '|':
-		add_token(token_type::PIPE);
+		if (match('|'))
+		{
+			add_token(token_type::OR);
+		}
+		else
+		{
+			add_token(token_type::BITWISE_OR);
+		}
+		break;
+	case '&':
+		if (match('&'))
+		{
+			add_token(token_type::AND);
+		}
+		else
+		{
+			add_token(token_type::BITWISE_AND);
+		}
 		break;
 	case ':':
 		add_token(token_type::COLON);
@@ -226,25 +242,38 @@ void chclang::scanning::scanner::scan_next_token()
 	case '\n':
 		line_++;
 		break;
-
-	case '"':
-		scan_string();
-		break;
-
-	default:
-		if (validator::valid_number_literal_component(c))
-		{
-			scan_number_literal();
-		}
-		else if (validator::valid_identifier_component(c))
-		{
-			scan_identifier();
-		}
-		else
-		{
-			logging::logger::instance().error(line_, format("Unexpected character {}.", c));
-		}
+//
+//	case '"':
+//		scan_string();
+//		break;
+//
+//	default:
+//		if (validator::valid_number_literal_component(c))
+//		{
+//			scan_number_literal();
+//		}
+//		else if (validator::valid_identifier_component(c))
+//		{
+//			scan_identifier();
+//		}
+//		else
+//		{
+//			logging::logger::instance().error(line_, format("Unexpected character {}.", c));
+//		}
 
 		break;
 	}
+}
+
+void chclang::scanning::scanner::consume_line_comment()
+{
+	while (peek() != '\n' && !is_end())
+	{
+		[[maybe_unused]] auto discard = advance();
+	}
+}
+
+void chclang::scanning::scanner::consume_block_comment()
+{
+
 }

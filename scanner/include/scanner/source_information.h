@@ -15,15 +15,18 @@
 //
 #pragma once
 
+#include <fmt/format.h>
+
 #include <string>
+#include <string_view>
 
 namespace chclang::scanning
 {
 class source_information final
 {
 public:
-	explicit source_information(size_t line, size_t col, std::string filename = "")
-			: line_(line), column_(col), file_name_(std::move(filename))
+	explicit source_information(size_t line, size_t col, std::string context = "", std::string filename = "")
+			: line_(line), column_(col), context_(std::move(context)), file_name_(std::move(filename))
 	{
 	}
 
@@ -35,9 +38,63 @@ public:
 
 	source_information& operator=(const source_information&) = default;
 
+	[[nodiscard]] size_t line() const
+	{
+		return line_;
+	}
+
+	[[nodiscard]] size_t column() const
+	{
+		return column_;
+	}
+
+
+	[[nodiscard]] std::string context() const
+	{
+		return context_;
+	}
+
+	[[nodiscard]] std::string file() const
+	{
+		return file_name_;
+	}
+
 private:
-	std::string file_name_{};
 	size_t line_{};
 	size_t column_{};
+
+	std::string context_{};
+	std::string file_name_{};
 };
 }
+
+template<>
+struct fmt::formatter<chclang::scanning::source_information>
+{
+	bool title{ false };
+
+	constexpr auto parse(fmt::format_parse_context& context)
+	{
+		auto it = context.begin(), end = context.end();
+		if (it != end && (*it == 't' || *it == 'c')) title = (*it++) == 't';
+
+		if (it != end && *it != '}') throw fmt::format_error("Invalid format");
+
+		return it;
+	}
+
+	template<class FormatContext>
+	auto format(
+			const chclang::scanning::source_information& src,
+			FormatContext& context)
+	{
+		if (title)
+		{
+			return format_to(context.out(), "{}:{}:{}", src.file(),src.line(),src.column());
+		}
+		else
+		{
+			return format_to(context.out(), "  ", src.context());
+		}
+	}
+};

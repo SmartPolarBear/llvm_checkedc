@@ -11,60 +11,28 @@
 //
 
 //
-// Created by cleve on 2/24/2022.
+// Created by cleve on 2/28/2022.
 //
 
-#pragma once
+#include "logger/logger.h"
 
-#include "scanner/token.h"
+using namespace chclang::logging;
 
-#include <fstream>
-#include <string>
-#include <queue>
-#include <vector>
-
-#include <gsl/gsl>
-
-namespace chclang::scanning
+void chclang::logging::logger::set_info_stream(std::ostream& info)
 {
-class scanner
+	info_ = &info;
+}
+
+void chclang::logging::logger::set_error_stream(std::ostream& err)
 {
-public:
-	explicit scanner(std::string source);
+	error_ = &err;
+}
 
-	std::vector<token> scan();
-private:
-	void consume_line_comment();
-	void consume_block_comment();
+void
+chclang::logging::logger::write(chclang::logging::message_level level, const chclang::scanning::source_information& src,
+		const std::string& msg)
+{
+	auto stream = (level == message_level::ERROR ? error_ : info_);
 
-	[[nodiscard]] static inline bool is_digit(char c);
-
-	[[nodiscard]] static inline bool is_letter(char c);
-
-	[[nodiscard]] inline bool is_end() const noexcept
-	{
-		return cur_ >= src_.size();
-	}
-
-	void add_token(token_type type, std::optional<literal_value_type> lit = std::nullopt);
-
-	char advance();
-
-	[[nodiscard]] char peek(size_t n = 0);
-
-	[[nodiscard]] bool match(char expect);
-
-	[[nodiscard]] std::string lexeme();
-
-	void scan_next_token();
-
-	std::vector<token> tokens_{};
-
-	std::string src_path_{};
-
-	std::string src_{};
-	gsl::index cur_{ 0 }, start_{ 0 };
-
-	size_t line_{}, col_{};
-};
+	*stream << fmt::format("{0:t}: {1} {2}\n{0:c}", src, level, msg);
 }

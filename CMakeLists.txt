@@ -42,3 +42,4 @@ target_link_libraries(chclang
 
 add_subdirectory(base)
 add_subdirectory(scanner)
+add_subdirectory(logger)
