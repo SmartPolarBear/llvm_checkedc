@@ -15,6 +15,7 @@
 //
 
 #include "base/exceptions.h"
+#include "logger/logger.h"
 #include "scanner/scanner.h"
 
 #include <cctype>
@@ -22,6 +23,7 @@
 
 using namespace std;
 using namespace chclang::exceptions;
+using namespace chclang::logging;
 
 bool chclang::scanning::scanner::is_digit(char c)
 {
@@ -275,5 +277,27 @@ void chclang::scanning::scanner::consume_line_comment()
 
 void chclang::scanning::scanner::consume_block_comment()
 {
+	while (!is_end())
+	{
+		auto c = advance();
+		if (c == '\n')
+		{
+			line_++;
+		}
+		else if (c == '*' && peek() == '/')
+		{
+			[[maybe_unused]]auto _ = advance(); // eat "/"
+			return;
+		}
+		else if (c == '/' && peek() == '*')
+		{
+			[[maybe_unused]]auto _ = advance(); // eat "*"
+			consume_block_comment(); // nested block comment
+		}
+	}
 
+	if (!is_end())
+	{
+		logger::instance().error(source_information{ line_, col_, src_path_ }, "Unclosed block comment found.");
+	}
 }

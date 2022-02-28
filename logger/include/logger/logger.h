@@ -52,6 +52,21 @@ public:
 
 	void write(message_level level, const scanning::source_information& src, const std::string& msg);
 
+	inline void error(const scanning::source_information& src, const std::string& msg)
+	{
+		write(message_level::ERROR, src, msg);
+	}
+
+	inline void warning(const scanning::source_information& src, const std::string& msg)
+	{
+		write(message_level::WARNING, src, msg);
+	}
+
+	inline void info(const scanning::source_information& src, const std::string& msg)
+	{
+		write(message_level::INFO, src, msg);
+	}
+
 private:
 	std::ostream* info_{ &std::clog };
 	std::ostream* error_{ &std::cerr };

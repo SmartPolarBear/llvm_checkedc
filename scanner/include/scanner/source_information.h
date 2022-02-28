@@ -25,7 +25,7 @@ namespace chclang::scanning
 class source_information final
 {
 public:
-	explicit source_information(size_t line, size_t col, std::string context = "", std::string filename = "")
+	explicit source_information(size_t line, size_t col, std::string filename = "", std::string context = "")
 			: line_(line), column_(col), context_(std::move(context)), file_name_(std::move(filename))
 	{
 	}
@@ -90,7 +90,7 @@ struct fmt::formatter<chclang::scanning::source_information>
 	{
 		if (title)
 		{
-			return format_to(context.out(), "{}:{}:{}", src.file(),src.line(),src.column());
+			return format_to(context.out(), "{}:{}:{}", src.file(), src.line(), src.column());
 		}
 		else
 		{
