@@ -41,5 +41,7 @@ target_link_libraries(chclang
         fmt::fmt-header-only)
 
 add_subdirectory(base)
-add_subdirectory(scanner)
 add_subdirectory(logger)
+
+add_subdirectory(scanner)
+add_subdirectory(parser)

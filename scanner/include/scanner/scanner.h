@@ -33,8 +33,10 @@ public:
 	explicit scanner(std::string source);
 
 	std::vector<token> scan();
+
 private:
 	void consume_line_comment();
+
 	void consume_block_comment();
 
 	[[nodiscard]] static inline bool is_digit(char c);
@@ -63,8 +65,9 @@ private:
 	std::string src_path_{};
 
 	std::string src_{};
-	gsl::index cur_{ 0 }, start_{ 0 };
 
+	// TODO: put these in a better "context manager" for better error handling
+	gsl::index cur_{ 0 }, start_{ 0 };
 	size_t line_{}, col_{};
 };
 }

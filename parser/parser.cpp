@@ -11,35 +11,9 @@
 //
 
 //
-// Created by cleve on 2/28/2022.
+// Created by cleve on 3/1/2022.
 //
 
-#include "logger/logger.h"
+#include "parser/parser.h"
 
-using namespace chclang::logging;
 
-void chclang::logging::logger::set_info_stream(std::ostream& info)
-{
-	info_ = &info;
-}
-
-void chclang::logging::logger::set_error_stream(std::ostream& err)
-{
-	error_ = &err;
-}
-
-void
-chclang::logging::logger::write(chclang::logging::message_level level, const chclang::scanning::source_information& src,
-		const std::string& msg)
-{
-	auto stream = (level == message_level::ERROR ? error_ : info_);
-
-	if (!src.context().empty())
-	{
-		*stream << fmt::format("{0:t}: {1} {2}\n{0:c}", src, level, msg);
-	}
-	else
-	{
-		*stream << fmt::format("{0:t}: {1} {2}", src, level, msg);
-	}
-}
