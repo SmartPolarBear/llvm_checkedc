@@ -39,14 +39,24 @@ private:
 
 	void consume_block_comment();
 
+	void scan_string();
+
+	void scan_number_literal();
+
+	void scan_identifier();
+
 	[[nodiscard]] static inline bool is_digit(char c);
 
 	[[nodiscard]] static inline bool is_letter(char c);
+
+	[[nodiscard]] static inline bool is_number_literal_component(char c);
 
 	[[nodiscard]] inline bool is_end() const noexcept
 	{
 		return cur_ >= src_.size();
 	}
+
+	[[nodiscard]] source_information current_source_information() const;
 
 	void add_token(token_type type, std::optional<literal_value_type> lit = std::nullopt);
 
