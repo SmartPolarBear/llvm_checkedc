@@ -410,6 +410,17 @@ void chclang::scanning::scanner::scan_number_literal()
 
 void chclang::scanning::scanner::scan_identifier()
 {
+	while (is_digit(peek()) || is_letter(peek()))advance();
 
+	auto identifier = lexeme();
+
+	if (keywords_to_type_.contains(identifier))
+	{
+		add_token(keywords_to_type_.at(identifier));
+	}
+	else
+	{
+		add_token(token_type::IDENTIFIER);
+	}
 }
 

@@ -48,7 +48,7 @@ enum class token_type
 	// Keywords.
 	STRUCT, ENUM, ELSE, FALSE, VOID, FOR, IF,
 	RETURN, THIS, TRUE, WHILE, DO,
-	SIZEOF,
+	SIZEOF, CONST,
 
 	END_OF_FILE,
 };

@@ -22,6 +22,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include <unordered_map>
 
 #include <gsl/gsl>
 
@@ -35,6 +36,22 @@ public:
 	std::vector<token> scan();
 
 private:
+	static inline std::unordered_map<std::string, token_type> keywords_to_type_{
+			{ "struct",       token_type::STRUCT },
+			{ "enum",       token_type::STRUCT },
+			{ "else",        token_type::ELSE },
+			{ "false",       token_type::FALSE },
+			{ "for",         token_type::FOR },
+			{ "if",          token_type::IF },
+			{ "return",      token_type::RETURN },
+			{ "void",        token_type::VOID },
+			{ "this",        token_type::THIS },
+			{ "true",        token_type::TRUE },
+			{ "const",         token_type::CONST },
+			{ "while",       token_type::WHILE },
+			{ "sizeof",      token_type::SIZEOF }
+	};
+
 	void consume_line_comment();
 
 	void consume_block_comment();
