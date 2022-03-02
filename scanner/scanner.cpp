@@ -33,8 +33,8 @@ bool chclang::scanning::scanner::is_digit(char c)
 bool chclang::scanning::scanner::is_letter(char c)
 {
 	return (c >= 'a' && c <= 'z') ||
-		   (c >= 'A' && c <= 'Z') ||
-		   c == '_';
+		(c >= 'A' && c <= 'Z') ||
+		c == '_';
 }
 
 bool chclang::scanning::scanner::is_number_literal_component(char c)
@@ -42,15 +42,14 @@ bool chclang::scanning::scanner::is_number_literal_component(char c)
 	return is_digit(c) || c == 'x' || c == 'X' || c == 'b' || c == 'B';
 }
 
-
 chclang::scanning::scanner::scanner(std::string source)
-		: src_path_(std::move(source))
+	: src_path_(std::move(source))
 {
-	std::ifstream input{ src_path_, std::ios::in };
+	std::ifstream input{src_path_, std::ios::in};
 
 	if (!input.is_open())
 	{
-		throw file_operation_error{ src_path_ };
+		throw file_operation_error{src_path_};
 	}
 
 	stringstream ss{};
@@ -75,16 +74,28 @@ char chclang::scanning::scanner::advance()
 
 char chclang::scanning::scanner::peek(size_t n)
 {
-	if (is_end())return 0;
-	if (cur_ + n >= src_.size())return 0;
+	if (is_end())
+	{
+		return 0;
+	}
+	if (cur_ + n >= src_.size())
+	{
+		return 0;
+	}
 
 	return src_.at(cur_ + n);
 }
 
 bool chclang::scanning::scanner::match(char expect)
 {
-	if (is_end())return false;
-	if (src_.at(cur_) != expect)return false;
+	if (is_end())
+	{
+		return false;
+	}
+	if (src_.at(cur_) != expect)
+	{
+		return false;
+	}
 
 	if (src_.at(cur_) != '\n')
 	{
@@ -105,7 +116,7 @@ std::string chclang::scanning::scanner::lexeme()
 
 void chclang::scanning::scanner::add_token(chclang::scanning::token_type type, optional<literal_value_type> lit)
 {
-	source_information src_info{ line_, col_ };
+	source_information src_info{line_, col_};
 	tokens_.emplace_back(type, lexeme(), lit, src_info);
 }
 
@@ -126,29 +137,21 @@ void chclang::scanning::scanner::scan_next_token()
 	char c = advance();
 	switch (c)
 	{
-	case '(':
-		add_token(token_type::LEFT_PAREN);
+	case '(': add_token(token_type::LEFT_PAREN);
 		break;
-	case ')':
-		add_token(token_type::RIGHT_PAREN);
+	case ')': add_token(token_type::RIGHT_PAREN);
 		break;
-	case '[':
-		add_token(token_type::LEFT_BRACKET);
+	case '[': add_token(token_type::LEFT_BRACKET);
 		break;
-	case ']':
-		add_token(token_type::RIGHT_BRACKET);
+	case ']': add_token(token_type::RIGHT_BRACKET);
 		break;
-	case '{':
-		add_token(token_type::LEFT_BRACE);
+	case '{': add_token(token_type::LEFT_BRACE);
 		break;
-	case '}':
-		add_token(token_type::RIGHT_BRACE);
+	case '}': add_token(token_type::RIGHT_BRACE);
 		break;
-	case ',':
-		add_token(token_type::COMMA);
+	case ',': add_token(token_type::COMMA);
 		break;
-	case '.':
-		add_token(token_type::DOT);
+	case '.': add_token(token_type::DOT);
 		break;
 	case '-':
 		if (match('-'))
@@ -159,9 +162,23 @@ void chclang::scanning::scanner::scan_next_token()
 		{
 			add_token(token_type::ARROW);
 		}
+		else if (match('='))
+		{
+			add_token(token_type::MINUS_EQUAL);
+		}
 		else
 		{
 			add_token(token_type::MINUS);
+		}
+		break;
+	case '%':
+		if (match('='))
+		{
+			add_token(token_type::MOD);
+		}
+		else
+		{
+			add_token(token_type::MOD_EQUAL);
 		}
 		break;
 	case '+':
@@ -169,30 +186,49 @@ void chclang::scanning::scanner::scan_next_token()
 		{
 			add_token(token_type::PLUS_PLUS);
 		}
+		else if (match('='))
+		{
+			add_token(token_type::PLUS_EQUAL);
+		}
 		else
 		{
 			add_token(token_type::PLUS);
 		}
 		break;
-	case ';':
-		add_token(token_type::SEMICOLON);
+	case ';': add_token(token_type::SEMICOLON);
 		break;
 	case '*':
-		add_token(token_type::STAR);
+		if (match('='))
+		{
+			add_token(token_type::STAR_EQUAL);
+		}
+		else
+		{
+			add_token(token_type::STAR);
+		}
 		break;
-	case '?':
-		add_token(token_type::QMARK);
+	case '?': add_token(token_type::QMARK);
 		break;
 	case '^':
-		add_token(token_type::BITWISE_XOR);
+		if (match('='))
+		{
+			add_token(token_type::BITWISE_XOR_EQUAL);
+		}
+		else
+		{
+			add_token(token_type::BITWISE_XOR);
+		}
 		break;
-	case '~':
-		add_token(token_type::BITWISE_NOT);
+	case '~': add_token(token_type::BITWISE_NOT);
 		break;
 	case '|':
 		if (match('|'))
 		{
 			add_token(token_type::OR);
+		}
+		else if (match('='))
+		{
+			add_token(token_type::BITWISE_OR_EQUAL);
 		}
 		else
 		{
@@ -204,26 +240,25 @@ void chclang::scanning::scanner::scan_next_token()
 		{
 			add_token(token_type::AND);
 		}
+		else if (match('='))
+		{
+			add_token(token_type::BITWISE_AND_EQUAL);
+		}
 		else
 		{
 			add_token(token_type::BITWISE_AND);
 		}
 		break;
-	case ':':
-		add_token(token_type::COLON);
+	case ':': add_token(token_type::COLON);
 		break;
 
-	case '!':
-		add_token(match('=') ? token_type::BANG_EQUAL : token_type::BANG);
+	case '!': add_token(match('=') ? token_type::BANG_EQUAL : token_type::BANG);
 		break;
-	case '=':
-		add_token(match('=') ? token_type::EQUAL_EQUAL : token_type::EQUAL);
+	case '=': add_token(match('=') ? token_type::EQUAL_EQUAL : token_type::EQUAL);
 		break;
-	case '<':
-		add_token(match('=') ? token_type::LESS_EQUAL : token_type::LESS);
+	case '<': add_token(match('=') ? token_type::LESS_EQUAL : token_type::LESS);
 		break;
-	case '>':
-		add_token(match('=') ? token_type::GREATER_EQUAL : token_type::GREATER);
+	case '>': add_token(match('=') ? token_type::GREATER_EQUAL : token_type::GREATER);
 		break;
 
 	case '/':
@@ -234,6 +269,10 @@ void chclang::scanning::scanner::scan_next_token()
 		else if (match('*')) // this is a block comment
 		{
 			consume_block_comment();
+		}
+		else if (match('='))
+		{
+			add_token(token_type::SLASH_EQUAL);
 		}
 		else
 		{
@@ -247,12 +286,10 @@ void chclang::scanning::scanner::scan_next_token()
 		// Do nothing to ignore whitespaces.
 		break;
 
-	case '\n':
-		line_++;
+	case '\n': line_++;
 		break;
 
-	case '"':
-		scan_string();
+	case '"': scan_string();
 		break;
 
 	default:
@@ -310,14 +347,17 @@ void chclang::scanning::scanner::consume_block_comment()
 
 chclang::scanning::source_information chclang::scanning::scanner::current_source_information() const
 {
-	return source_information{ line_, col_, src_path_ };
+	return source_information{line_, col_, src_path_};
 }
 
 void chclang::scanning::scanner::scan_string()
 {
 	while (peek() != '"' && !is_end())
 	{
-		if (peek() == '\n')line_++;
+		if (peek() == '\n')
+		{
+			line_++;
+		}
 		advance();
 	}
 
@@ -345,7 +385,7 @@ void chclang::scanning::scanner::scan_number_literal()
 		if (!is_number_literal_component(peek()))
 		{
 			logging::logger::instance().error(current_source_information(),
-					fmt::format("Invalid number literal {}.", lexeme()));
+											  fmt::format("Invalid number literal {}.", lexeme()));
 		}
 
 		while (is_number_literal_component(peek()))
@@ -353,15 +393,15 @@ void chclang::scanning::scanner::scan_number_literal()
 			advance();
 		}
 
-		uint64_t value{ 0 };
+		uint64_t value{0};
 
 		auto num = lexeme();
-		for (const auto& n: num)
+		for (const auto &n: num)
 		{
 			if (n != '0' && n != '1')
 			{
 				logging::logger::instance().error(current_source_information(),
-						fmt::format("Invalid binary number literal {}.", num));
+												  fmt::format("Invalid binary number literal {}.", num));
 				break;
 			}
 
@@ -384,33 +424,35 @@ void chclang::scanning::scanner::scan_number_literal()
 		}
 	}
 
-	bool floating{ false };
+	bool floating{false};
 	if (peek() == '.' && is_number_literal_component(peek(1)))
 	{
 		floating = true;
 		advance();
-		while (is_number_literal_component(peek()))advance();
+		while (is_number_literal_component(peek()))
+			advance();
 	}
 
 	if (integral && floating)
 	{
 		logging::logger::instance().error(current_source_information(),
-				fmt::format("Invalid number literal {}.", lexeme()));
+										  fmt::format("Invalid number literal {}.", lexeme()));
 
 	}
 	else if (floating)
 	{
-		add_token(token_type::FLOATING, std::stold(string{ lexeme() }));
+		add_token(token_type::FLOATING, std::stold(string{lexeme()}));
 	}
 	else
 	{
-		add_token(token_type::INTEGER, std::stoll(string{ lexeme() }));
+		add_token(token_type::INTEGER, std::stoll(string{lexeme()}));
 	}
 }
 
 void chclang::scanning::scanner::scan_identifier()
 {
-	while (is_digit(peek()) || is_letter(peek()))advance();
+	while (is_digit(peek()) || is_letter(peek()))
+		advance();
 
 	auto identifier = lexeme();
 

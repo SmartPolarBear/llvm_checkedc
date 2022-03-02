@@ -22,10 +22,10 @@ void compile_file(const std::string& file)
 	auto tokens = scanner.scan();
 
 	// print all tokens
-	//	for (const auto& t: tokens)
-	//	{
-	//		cout << t.lexeme() << " ";
-	//	}
+	for (const auto &t: tokens)
+	{
+		cout << t.lexeme() << " ";
+	}
 
 
 }
