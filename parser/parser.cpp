@@ -17,3 +17,7 @@
 #include "parser/parser.h"
 
 
+chclang::parsing::parser::parser(std::vector<scanning::token> tks)
+		: tokens_(std::move(tks))
+{
+}

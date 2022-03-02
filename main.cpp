@@ -20,10 +20,14 @@ void compile_file(const std::string& file)
 {
 	scanning::scanner scanner{ file };
 	auto tokens = scanner.scan();
-	for (auto t: tokens)
-	{
-		cout << t.lexeme() << endl;
-	}
+
+	// print all tokens
+	//	for (const auto& t: tokens)
+	//	{
+	//		cout << t.lexeme() << " ";
+	//	}
+
+
 }
 
 void compile(const ArgumentParser& program)

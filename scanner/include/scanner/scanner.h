@@ -37,19 +37,34 @@ public:
 
 private:
 	static inline std::unordered_map<std::string, token_type> keywords_to_type_{
-			{ "struct",       token_type::STRUCT },
-			{ "enum",       token_type::STRUCT },
-			{ "else",        token_type::ELSE },
-			{ "false",       token_type::FALSE },
-			{ "for",         token_type::FOR },
-			{ "if",          token_type::IF },
-			{ "return",      token_type::RETURN },
-			{ "void",        token_type::VOID },
-			{ "this",        token_type::THIS },
-			{ "true",        token_type::TRUE },
-			{ "const",         token_type::CONST },
-			{ "while",       token_type::WHILE },
-			{ "sizeof",      token_type::SIZEOF }
+		{"struct", token_type::STRUCT},
+		{"enum", token_type::ENUM},
+		{"else", token_type::ELSE},
+		{"false", token_type::FALSE},
+		{"for", token_type::FOR},
+		{"if", token_type::IF},
+		{"return", token_type::RETURN},
+		{"void", token_type::VOID},
+		{"this", token_type::THIS},
+		{"true", token_type::TRUE},
+		{"switch", token_type::SWITCH},
+		{"case", token_type::CASE},
+		{"const", token_type::CONST},
+		{"while", token_type::WHILE},
+		{"sizeof", token_type::SIZEOF},
+		{"do", token_type::DO},
+		{"short", token_type::SHORT},
+		{"float", token_type::FLOAT},
+		{"int", token_type::INT},
+		{"long", token_type::LONG},
+		{"signed", token_type::SIGNED},
+		{"unsigned", token_type::UNSIGNED},
+		{"double", token_type::DOUBLE},
+		{"goto", token_type::GOTO},
+		{"default", token_type::DEFAULT},
+		{"typedef", token_type::TYPEDEF},
+		{"union", token_type::UNION},
+
 	};
 
 	void consume_line_comment();
@@ -94,7 +109,7 @@ private:
 	std::string src_{};
 
 	// TODO: put these in a better "context manager" for better error handling
-	gsl::index cur_{ 0 }, start_{ 0 };
+	gsl::index cur_{0}, start_{0};
 	size_t line_{}, col_{};
 };
 }

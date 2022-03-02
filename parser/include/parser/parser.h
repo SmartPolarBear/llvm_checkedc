@@ -16,7 +16,20 @@
 
 #pragma once
 
+#include <scanner/token.h>
+
+#include <vector>
+
 namespace chclang::parsing
 {
+class parser
+{
+public:
+	explicit parser(std::vector<scanning::token> tks);
+private:
 
+
+
+	std::vector<scanning::token> tokens_{};
+};
 }
