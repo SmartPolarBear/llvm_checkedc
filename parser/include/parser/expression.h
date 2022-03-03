@@ -24,5 +24,6 @@ class expression
 {
 public:
 	virtual llvm::Value *codegen() = 0;
+	virtual llvm::Type *type() = 0;
 };
 }

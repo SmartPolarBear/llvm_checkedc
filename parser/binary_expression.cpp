@@ -15,4 +15,11 @@
 //
 #include "parser/expression/binary_expression.h"
 
-
+llvm::Value *chclang::parsing::binary_expression::codegen()
+{
+	return nullptr;
+}
+llvm::Type *chclang::parsing::binary_expression::type()
+{
+	return nullptr;
+}

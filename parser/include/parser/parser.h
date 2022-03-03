@@ -15,11 +15,16 @@
 //
 
 #pragma once
+
+#include "base/iterable_stack.h"
+
 #include "parser/statement.h"
 #include "parser/expression.h"
 #include "scanner/token.h"
 
 #include <vector>
+
+#include <gsl/gsl>
 
 namespace chclang::parsing
 {
@@ -27,19 +32,28 @@ class parser
 {
 public:
 	explicit parser(std::vector<scanning::token> tks);
+
+	std::vector<std::shared_ptr<statement>> parse();
 private:
+	struct parser_state
+	{
+		gsl::index current_token;
+	};
+
 	/// translate_unit -> external_declaration*
-	void translate_unit();
+	std::shared_ptr<statement> translate_unit();
 
 	/// external_declaration -> function_definition | declaration
-	void external_declaration();
+	std::shared_ptr<statement> external_declaration();
 
 	/// function_definition -> declaration_specifiers declarator declaration_list compound_statement
-	void function_definition();
+	std::shared_ptr<statement> function_definition();
 
 	/// declaration_specifiers -> (storage_class_specifier|type_specifier|type_qualifier|function_specifier)*
-	void declaration_specifiers();
+	std::shared_ptr<statement> declaration_specifiers();
 
 	std::vector<scanning::token> tokens_{};
+
+	base::iterable_stack<parser_state> states_{};
 };
 }

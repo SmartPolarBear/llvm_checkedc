@@ -17,6 +17,7 @@
 #pragma once
 
 #include <llvm/IR/Value.h>
+#include <llvm/IR/Type.h>
 
 namespace chclang::parsing
 {
@@ -24,6 +25,7 @@ class statement
 {
 public:
 	virtual llvm::Value *codegen() = 0;
+	virtual llvm::Type *type() = 0;
 };
 
 }

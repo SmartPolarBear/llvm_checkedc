@@ -23,6 +23,8 @@ namespace chclang::parsing
 class binary_expression final :
 	public expression
 {
-
+public:
+	llvm::Value *codegen() override;
+	llvm::Type *type() override;
 };
 }
