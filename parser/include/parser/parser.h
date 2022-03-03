@@ -17,7 +17,7 @@
 #pragma once
 
 #include "base/iterable_stack.h"
-
+#include "base/exceptions.h"
 #include "parser/statement.h"
 #include "parser/expression.h"
 #include "scanner/token.h"
@@ -52,8 +52,31 @@ private:
 	/// declaration_specifiers -> (storage_class_specifier|type_specifier|type_qualifier|function_specifier)*
 	std::shared_ptr<statement> declaration_specifiers();
 
+	/// storage_class_specifier -> typedef|extern|static
+	storage_class storage_class_specifier();
+
+	void synchronize();
+
+	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string &msg);
+
+	[[nodiscard]] exceptions::parse_error error(scanning::token t, const std::string &msg);
+
+	[[nodiscard]] bool match(std::initializer_list<scanning::token_type> types, gsl::index next = 0);
+
+	[[nodiscard]] bool check(scanning::token_type t, gsl::index next = 0);
+
+	[[nodiscard]] scanning::token peek(gsl::index offset = 0);
+
+	[[nodiscard]] scanning::token advance();
+
+	[[nodiscard]] bool is_end() const;
+
+	[[nodiscard]] scanning::token previous();
+
 	std::vector<scanning::token> tokens_{};
 
 	base::iterable_stack<parser_state> states_{};
+
+	parser_state current_{};
 };
 }

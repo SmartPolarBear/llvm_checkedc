@@ -14,10 +14,87 @@
 // Created by cleve on 3/1/2022.
 //
 
+#include "logger/logger.h"
+
 #include "parser/parser.h"
-#include "parser//visitor.h"
+#include "parser/visitor.h"
+
+using namespace chclang::parsing;
+using namespace chclang::exceptions;
 
 chclang::parsing::parser::parser(std::vector<scanning::token> tks)
 	: tokens_(std::move(tks))
 {
+}
+
+chclang::parsing::storage_class chclang::parsing::parser::storage_class_specifier()
+{
+
+	return 0;
+}
+
+void parser::synchronize()
+{
+
+}
+
+chclang::scanning::token parser::consume(chclang::scanning::token_type t, const std::string &msg)
+{
+	if (check(t))
+	{
+		return advance();
+	}
+	throw error(peek(), msg);
+}
+
+chclang::exceptions::parse_error parser::error(chclang::scanning::token t, const std::string &msg)
+{
+	logging::logger::instance().error(t.source_info(), msg);
+	return parse_error(msg);
+}
+
+bool parser::match(std::initializer_list<scanning::token_type> types, gsl::index next)
+{
+	for (const auto &t: types)
+	{
+		if (check(t, next))
+		{
+			[[maybe_unused]]auto _ = advance();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool parser::check(chclang::scanning::token_type t, gsl::index next)
+{
+	if (is_end())
+	{
+		return false;
+	}
+	return peek(next).type() == t;
+}
+
+chclang::scanning::token parser::peek(gsl::index offset)
+{
+	return tokens_.at(current_.current_token + offset);
+}
+
+chclang::scanning::token parser::advance()
+{
+	if (!is_end())
+	{
+		current_.current_token++;
+	}
+	return previous();
+}
+
+bool parser::is_end() const
+{
+	return tokens_[current_.current_token].type() == scanning::token_type::END_OF_FILE;
+}
+
+chclang::scanning::token parser::previous()
+{
+	return tokens_.at(current_.current_token - 1);
 }

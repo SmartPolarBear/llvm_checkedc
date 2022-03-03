@@ -18,8 +18,20 @@
 
 #include <llvm/IR/Value.h>
 
+#include <cctype>
+
 namespace chclang::parsing
 {
+
+enum storage_class_offs
+{
+	STORAGE_CLASS_TYPEDEF_OFF,
+	STORAGE_CLASS_EXTERN_OFF,
+	STORAGE_CLASS_STATIC_OFF
+};
+
+using storage_class = uint32_t;
+
 class expression
 {
 public:

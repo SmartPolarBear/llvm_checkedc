@@ -24,15 +24,29 @@
 namespace chclang::exceptions
 {
 class file_operation_error
-		: public std::runtime_error
+	: public std::runtime_error
 {
 public:
-	explicit file_operation_error(const std::string& filename)
-			: filename_(filename), std::runtime_error(fmt::format("{} file error", filename))
+	explicit file_operation_error(const std::string &filename)
+		: filename_(filename), std::runtime_error(fmt::format("{} file error", filename))
 	{
 	}
 
 private:
 	std::string filename_{};
+};
+
+class parse_error
+	: public std::runtime_error
+{
+public:
+
+	explicit parse_error(const std::string& msg)
+		: std::runtime_error(msg)
+	{
+	}
+
+	~parse_error() override = default;
+
 };
 }

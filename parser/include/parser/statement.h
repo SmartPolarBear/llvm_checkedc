@@ -21,6 +21,7 @@
 
 namespace chclang::parsing
 {
+
 class statement
 {
 public:
