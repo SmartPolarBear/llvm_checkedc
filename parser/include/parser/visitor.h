@@ -17,7 +17,7 @@
 #pragma once
 
 //#BEGININC
-
+#include <parser/expression/binary_expression.h>
 //#ENDINC
 
 #include <memory>
@@ -25,11 +25,11 @@
 namespace chclang::parsing
 {
 template<typename R>
-class visitor
+class ast_visitor
 {
 public:
 //#BEGINOP
-
+virtual R operator()(const std::shared_ptr<binary_expression> &expr) = 0;
 //#ENDOP
 };
 }

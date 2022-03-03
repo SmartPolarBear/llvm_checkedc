@@ -16,12 +16,121 @@ import pathlib
 import datetime
 import json
 
-from typing import Final
-
 
 def file_date_time(path: str) -> datetime.datetime:
     fname = pathlib.Path(path)
     return datetime.datetime.fromtimestamp(fname.stat().st_mtime)
+
+
+def generate_includes(types: list[str], middle: str) -> list[str]:
+    return list("#include <parser/{}/{}.h>".format(middle, t) for t in types)
+
+
+def generate_operators(types: list[str], arg_name: str) -> list[str]:
+    return list("virtual R operator()(const std::shared_ptr<{0}> &{1}) = 0;".format(t, arg_name) for t in types)
+
+
+def write_back(inc: str, lines: list[str]):
+    logging.info("Writing result to {}.".format(inc))
+
+    with open(inc, "w") as f:
+        for l in lines:
+            f.write("{}\n".format(l))
+
+
+def generate_content(inc: str, stmts, exprs):
+    lines: list[str] = list()
+
+    with open(inc, "r") as incl:
+        line = incl.readline()
+        while len(line) != 0:
+            lines.append(line.strip())
+            line = incl.readline()
+
+    newlines: list = list()
+
+    begin_include_index = 0
+    try:
+        begin_include_index = lines.index('//#BEGININC')
+    except ValueError:
+        logging.error("Missing //#BEGININC tag in visitor.h")
+        exit(1)
+
+    for l in lines[:begin_include_index + 1]:
+        newlines.append(l)
+        if "#BEGININC" in l:
+            break
+
+    for i in generate_includes(exprs, "expression"):
+        newlines.append(i)
+
+    for i in generate_includes(stmts, "statement"):
+        newlines.append(i)
+
+    end_include_index = 0
+    try:
+        end_include_index = lines.index('//#ENDINC')
+    except ValueError:
+        logging.error("Missing //#ENDINC tag in visitor.h")
+        exit(1)
+
+    begin_op_index = 0
+    try:
+        begin_op_index = lines.index('//#BEGINOP')
+    except ValueError:
+        logging.error("Missing //#BEGINOP tag in visitor.h")
+        exit(1)
+
+    for l in lines[end_include_index:begin_op_index + 1]:
+        newlines.append(l)
+        if "#BEGINOP" in l:
+            break
+
+    for i in generate_operators(exprs, "expr"):
+        newlines.append(i)
+
+    for i in generate_operators(stmts, "stmt"):
+        newlines.append(i)
+
+    end_op_index = 0
+    try:
+        end_op_index = lines.index("//#ENDOP")
+    except ValueError:
+        logging.error("Missing //#ENDOP tag in visitor.h")
+        exit(1)
+
+    for l in lines[end_op_index:]:
+        newlines.append(l)
+
+    write_back(inc, newlines)
+
+    logging.info("{} expressions and {} statements is added.".format(len(exprs), len(stmts)))
+
+
+def generate(args: argparse):
+    logging.info("Configuration file is {}".format(args.config[0]))
+    logging.info("Include file is {}".format(args.include[0]))
+
+    config: str = args.config[0]
+    including: str = args.include[0]
+
+    if file_date_time(config) < file_date_time(including):
+        logging.info("Everything to update.")
+        exit(0)
+
+    exprs: list = []
+    stmts: list = []
+
+    with open(str(args.config[0]), "r") as conf:
+        conf_dict: dict = json.load(conf)
+
+        expressions: dict = conf_dict["expressions"]
+        exprs.extend(str(b) for b in expressions)
+
+        statements: dict = conf_dict["statements"]
+        stmts.extend(str(s) for s in statements)
+
+    generate_content(including, stmts, exprs)
 
 
 def file_pathname(arg: str) -> str:
@@ -36,90 +145,11 @@ def file_pathname(arg: str) -> str:
         raise argparse.ArgumentError(message="FATAL: path {} not exists".format(arg))
 
 
-def generate_includes(types: list[int], middle: str) -> list[str]:
-    return list("#include <parser/{}/{}>".format(middle, t) for t in types)
+if __name__ == "__main__":
+    # Logging to screen
+    formatter = logging.Formatter('%(message)s')
+    logging.getLogger('').setLevel(logging.DEBUG)
 
-
-def generate_operators(types: list[int], arg_name: str) -> list[str]:
-    return list("virtual R operator()(const std::shared_ptr<{0}> &{1}) = 0;".format(t, arg_name) for t in types)
-
-
-def write_back(inc: str, lines: list[str]):
-    logging.info("Writing result to {}.".format(inc))
-
-    with open(inc, "w") as f:
-        f.writelines(lines)
-
-
-def generate_content(inc: str, stmts, exprs):
-    lines: list[str] = list()
-
-    with open(inc, "r") as incl:
-        line = incl.readline()
-        while len(line) != 0:
-            lines.append(line.strip())
-            line = incl.readline()
-
-    newlines: list = list()
-    for l in lines:
-        newlines.append(l)
-        if "#BEGININC" in l:
-            break
-
-    for i in generate_includes(exprs, "expression"):
-        newlines.append(i)
-
-    for i in generate_includes(exprs, "statement"):
-        newlines.append(i)
-
-    end_include_index = newlines.index("//#ENDINC")
-
-    for l in lines[end_include_index:]:
-        newlines.append(l)
-        if "#BEGINOP" in l:
-            break
-
-    for i in generate_operators(exprs, "expr"):
-        newlines.append(i)
-
-    for i in generate_operators(stmts, "stmt"):
-        newlines.append(i)
-
-    end_op_index = newlines.index("//#ENDOP")
-
-    for l in lines[end_op_index:]:
-        newlines.append(l)
-
-    write_back(inc, lines)
-
-
-def generate(args: argparse):
-    logging.info("Configuration file is {}".format(args.config[0]))
-    logging.info("Include file is {}".format(args.include[0]))
-
-    config: str = args.config[0]
-    including: str = args.include[0]
-
-    if file_date_time(config) < file_date_time(including):
-        logging.info("Everything updated.")
-        exit(0)
-
-    exprs: list = []
-    stmts: list = []
-
-    with open(str(args.config[0]), "r") as conf:
-        conf_dict: dict = json.load(conf)
-
-        expressions: dict = conf_dict["expressions"]
-        exprs.append(str(b) for b in expressions)
-
-        statements: dict = conf_dict["statements"]
-        stmts.append(str(s) for s in statements)
-
-    generate_content(including, stmts, exprs)
-
-
-if __name__ == "main":
     parser: argparse = argparse.ArgumentParser(prog="visitor_gen", description="AST visitor generator")
 
     parser.add_argument('-c', '--config', type=lambda x: file_pathname(x), nargs=1,
