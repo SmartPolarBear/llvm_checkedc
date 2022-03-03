@@ -98,3 +98,19 @@ chclang::scanning::token parser::previous()
 {
 	return tokens_.at(current_.current_token - 1);
 }
+
+void parser::push_state()
+{
+	states_.push(current_);
+}
+
+parser::parser_state parser::pop_state()
+{
+	auto ret = states_.top();
+	return ret;
+}
+
+void parser::restore_state()
+{
+	current_ = pop_state();
+}

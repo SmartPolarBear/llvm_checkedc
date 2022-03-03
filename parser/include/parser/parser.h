@@ -55,6 +55,12 @@ private:
 	/// storage_class_specifier -> typedef|extern|static
 	storage_class storage_class_specifier();
 
+	void push_state();
+
+	parser_state pop_state();
+
+	void restore_state();
+
 	void synchronize();
 
 	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string &msg);
