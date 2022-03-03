@@ -11,35 +11,18 @@
 //
 
 //
-// Created by cleve on 3/1/2022.
+// Created by bear on 3/3/22.
 //
 
 #pragma once
-#include "parser/statement.h"
-#include "parser/expression.h"
-#include "scanner/token.h"
 
-#include <vector>
+#include <llvm/IR/Value.h>
 
 namespace chclang::parsing
 {
-class parser
+class expression
 {
 public:
-	explicit parser(std::vector<scanning::token> tks);
-private:
-	/// translate_unit -> external_declaration*
-	void translate_unit();
-
-	/// external_declaration -> function_definition | declaration
-	void external_declaration();
-
-	/// function_definition -> declaration_specifiers declarator declaration_list compound_statement
-	void function_definition();
-
-	/// declaration_specifiers -> (storage_class_specifier|type_specifier|type_qualifier|function_specifier)*
-	void declaration_specifiers();
-
-	std::vector<scanning::token> tokens_{};
+	virtual llvm::Value *codegen() = 0;
 };
 }
