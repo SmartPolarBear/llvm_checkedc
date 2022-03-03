@@ -11,13 +11,25 @@
 //
 
 //
-// Created by cleve on 3/1/2022.
+// Created by bear on 3/3/22.
 //
 
-#include "parser/parser.h"
-#include "parser//visitor.h"
+#pragma once
 
-chclang::parsing::parser::parser(std::vector<scanning::token> tks)
-	: tokens_(std::move(tks))
+//#BEGININC
+
+//#ENDINC
+
+#include <memory>
+
+namespace chclang::parsing
 {
+template<typename R>
+class visitor
+{
+public:
+//#BEGINOP
+
+//#ENDOP
+};
 }

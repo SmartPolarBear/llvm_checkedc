@@ -11,13 +11,18 @@
 //
 
 //
-// Created by cleve on 3/1/2022.
+// Created by bear on 3/3/22.
 //
 
-#include "parser/parser.h"
-#include "parser//visitor.h"
+#pragma once
 
-chclang::parsing::parser::parser(std::vector<scanning::token> tks)
-	: tokens_(std::move(tks))
+#include "parser/expression.h"
+
+namespace chclang::parsing
 {
+class binary_expression final :
+	public expression
+{
+
+};
 }

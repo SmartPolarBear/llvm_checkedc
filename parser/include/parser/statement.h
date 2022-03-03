@@ -20,9 +20,10 @@
 
 namespace chclang::parsing
 {
-class expression
+class statement
 {
 public:
 	virtual llvm::Value *codegen() = 0;
 };
+
 }
