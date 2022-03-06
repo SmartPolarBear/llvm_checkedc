@@ -15,6 +15,8 @@
 //
 #pragma once
 
+#include "scanner/token.h"
+
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -41,12 +43,18 @@ class parse_error
 {
 public:
 
-	explicit parse_error(const std::string& msg)
-		: std::runtime_error(msg)
+	explicit parse_error(scanning::token tk, const std::string &msg)
+		: tk_(std::move(tk)), std::runtime_error(msg)
 	{
 	}
 
 	~parse_error() override = default;
 
+	const scanning::token &token() const
+	{
+		return tk_;
+	}
+private:
+	const scanning::token tk_;
 };
 }

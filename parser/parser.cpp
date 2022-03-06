@@ -23,15 +23,11 @@ using namespace chclang::scanning;
 using namespace chclang::parsing;
 using namespace chclang::exceptions;
 
+using namespace std;
+
 chclang::parsing::parser::parser(std::vector<scanning::token> tks)
 	: tokens_(std::move(tks))
 {
-}
-
-chclang::parsing::storage_class chclang::parsing::parser::storage_class_specifier()
-{
-
-	return 0;
 }
 
 void parser::synchronize()
@@ -96,10 +92,10 @@ chclang::scanning::token parser::consume(chclang::scanning::token_type t, const 
 	throw error(peek(), msg);
 }
 
-chclang::exceptions::parse_error parser::error(chclang::scanning::token t, const std::string &msg)
+chclang::exceptions::parse_error parser::error(const chclang::scanning::token &t, const std::string &msg)
 {
-	logging::logger::instance().error(t.source_info(), msg);
-	return parse_error(msg);
+	// logging::logger::instance().error(t.source_info(), msg);
+	return parse_error(t, msg);
 }
 
 bool parser::match(std::initializer_list<scanning::token_type> types, gsl::index next)
@@ -163,3 +159,97 @@ void parser::restore_state()
 {
 	current_ = pop_state();
 }
+
+void parser::accept_state()
+{
+	while (!states_.empty())
+	{
+		states_.pop();
+	}
+}
+
+std::vector<std::shared_ptr<statement>> parser::parse()
+{
+	return translate_unit();
+}
+
+std::vector<std::shared_ptr<statement>> parser::translate_unit()
+{
+	std::vector<std::shared_ptr<statement>> decls{};
+	while (!is_end())
+	{
+		decls.push_back(external_declaration());
+	}
+	return decls;
+}
+
+std::shared_ptr<statement> parser::external_declaration()
+{
+	vector<parse_error> errors{};
+
+	push_state();
+	try
+	{
+		auto decl = declaration();
+		accept_state();
+		return decl;
+	}
+	catch ([[maybe_unused]]const parse_error &pe)
+	{
+		restore_state();
+		errors.push_back(pe);
+	}
+
+	push_state();
+	try
+	{
+		auto func = function_definition();
+		accept_state();
+		return func;
+	}
+	catch ([[maybe_unused]]const parse_error &pe)
+	{
+		restore_state();
+		errors.push_back(pe);
+	}
+
+	for (const auto &e: errors)
+	{
+		logging::logger::instance().error(e.token().source_info(), e.what());
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<statement> parser::function_definition()
+{
+	return std::shared_ptr<statement>();
+}
+
+std::shared_ptr<statement> parser::declaration_specifiers()
+{
+	return std::shared_ptr<statement>();
+}
+
+std::shared_ptr<statement> parser::declaration()
+{
+	return std::shared_ptr<statement>();
+}
+
+chclang::parsing::storage_class chclang::parsing::parser::storage_class_specifier()
+{
+	if (match({token_type::TYPEDEF, token_type::EXTERN, token_type::STATIC, token_type::AUTO}))
+	{
+		auto scs = previous();
+		switch (scs.type())
+		{
+		case token_type::TYPEDEF:
+			return
+			break;
+		}
+		return 0;
+	}
+
+	throw error(peek(), fmt::format("Invalid storage class specifier {}.", peek().lexeme()));
+}
+
