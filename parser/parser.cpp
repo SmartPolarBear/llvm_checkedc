@@ -19,6 +19,7 @@
 #include "parser/parser.h"
 #include "parser/visitor.h"
 
+using namespace chclang::scanning;
 using namespace chclang::parsing;
 using namespace chclang::exceptions;
 
@@ -35,7 +36,55 @@ chclang::parsing::storage_class chclang::parsing::parser::storage_class_specifie
 
 void parser::synchronize()
 {
+	[[maybe_unused]] auto _ = advance(); // discard it
+	while (!is_end())
+	{
+		if (previous().type() == token_type::SEMICOLON)
+		{
+			return;
+		}
 
+		switch (peek().type())
+		{
+			// keywords are synchronization points
+		case token_type::AUTO:
+		case token_type::BREAK:
+		case token_type::CASE:
+		case token_type::CHAR:
+		case token_type::CONST:
+		case token_type::CONTINUE:
+		case token_type::DEFAULT:
+		case token_type::DO:
+		case token_type::DOUBLE:
+		case token_type::ELSE:
+		case token_type::ENUM:
+		case token_type::EXTERN:
+		case token_type::FLOAT:
+		case token_type::FOR:
+		case token_type::GOTO:
+		case token_type::IF:
+		case token_type::INLINE:
+		case token_type::INT:
+		case token_type::LONG:
+		case token_type::RETURN:
+		case token_type::SHORT:
+		case token_type::SIGNED:
+		case token_type::SIZEOF:
+		case token_type::STATIC:
+		case token_type::STRUCT:
+		case token_type::SWITCH:
+		case token_type::TYPEDEF:
+		case token_type::UNION:
+		case token_type::UNSIGNED:
+		case token_type::VOID:
+		case token_type::VOLATILE:
+		case token_type::WHILE:
+			return;
+		default:
+			_ = advance();  // discard it
+			continue;
+		}
+	}
 }
 
 chclang::scanning::token parser::consume(chclang::scanning::token_type t, const std::string &msg)
