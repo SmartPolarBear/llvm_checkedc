@@ -41,7 +41,7 @@ private:
 	};
 
 	/// translate_unit -> external_declaration*
-	std::shared_ptr<statement> translate_unit();
+	std::vector<std::shared_ptr<statement>> translate_unit();
 
 	/// external_declaration -> function_definition | declaration
 	std::shared_ptr<statement> external_declaration();
@@ -55,17 +55,27 @@ private:
 	/// storage_class_specifier -> typedef|extern|static
 	storage_class storage_class_specifier();
 
+	std::shared_ptr<statement> declaration();
+
+	// for backtracking
 	void push_state();
 
 	parser_state pop_state();
 
 	void restore_state();
 
+	void accept_state();
+
+	// for error recovery
 	void synchronize();
 
-	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string &msg);
+	// for error report
+	[[nodiscard]] exceptions::parse_error error(const scanning::token &t, const std::string &msg);
 
-	[[nodiscard]] exceptions::parse_error error(scanning::token t, const std::string &msg);
+	// TODO: warnings
+
+	// for token reading and matching
+	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string &msg);
 
 	[[nodiscard]] bool match(std::initializer_list<scanning::token_type> types, gsl::index next = 0);
 
