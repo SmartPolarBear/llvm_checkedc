@@ -116,10 +116,10 @@ chclang::scanning::token parser::consume(chclang::scanning::token_type t, const 
 	throw error(peek(), msg);
 }
 
-chclang::exceptions::parse_error parser::error(chclang::scanning::token t, const std::string& msg)
+chclang::exceptions::parse_error parser::error(const scanning::token& t, const std::string& msg)
 {
 	logging::logger::instance().error(t.source_info(), msg);
-	return parse_error(msg);
+	return parse_error(t, msg);
 }
 
 bool parser::match(std::initializer_list<scanning::token_type> types, gsl::index next)
@@ -182,4 +182,39 @@ parser::parser_state parser::pop_state()
 void parser::restore_state()
 {
 	current_ = pop_state();
+}
+
+std::vector<std::shared_ptr<statement>> parser::parse()
+{
+	return std::vector<std::shared_ptr<statement>>();
+}
+
+std::vector<std::shared_ptr<statement>> parser::translate_unit()
+{
+	return std::vector<std::shared_ptr<statement>>();
+}
+
+std::shared_ptr<statement> parser::external_declaration()
+{
+	return std::shared_ptr<statement>();
+}
+
+std::shared_ptr<statement> parser::function_definition()
+{
+	return std::shared_ptr<statement>();
+}
+
+std::shared_ptr<statement> parser::declaration_specifiers()
+{
+	return std::shared_ptr<statement>();
+}
+
+std::shared_ptr<statement> parser::declaration()
+{
+	return std::shared_ptr<statement>();
+}
+
+void parser::accept_state()
+{
+
 }
