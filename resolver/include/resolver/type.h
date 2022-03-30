@@ -18,12 +18,52 @@
 
 #include "resolver/type_kind.h"
 
+#include <cstdint>
+#include <cstddef>
+
+#include <memory>
+
 namespace chclang::resolving
 {
 
 class type
 {
+public:
+	[[nodiscard]] type_kind kind() const
+	{
+		return kind_;
+	}
 
+	[[nodiscard]] size_t size() const
+	{
+		return size_;
+	}
+
+	[[nodiscard]] size_t alignment() const
+	{
+		return alignment_;
+	}
+
+	[[nodiscard]] bool is_unsigned() const
+	{
+		return unsigned_;
+	}
+
+	[[nodiscard]] bool is_atomic() const
+	{
+		return atomic_;
+	}
+
+private:
+	type_kind kind_{};
+	size_t size_{};
+	size_t alignment_{};
+
+	bool unsigned_{};
+	bool atomic_{};
+
+	std::weak_ptr<type> origin_{};
+	std::weak_ptr<type> base_{};
 };
 
 }
