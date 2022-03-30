@@ -23,6 +23,8 @@ using namespace chclang::scanning;
 using namespace chclang::parsing;
 using namespace chclang::exceptions;
 
+using namespace std;
+
 chclang::parsing::parser::parser(std::vector<scanning::token> tks)
 		: tokens_(std::move(tks))
 {
@@ -186,7 +188,13 @@ void parser::restore_state()
 
 std::vector<std::shared_ptr<statement>> parser::parse()
 {
-	return std::vector<std::shared_ptr<statement>>();
+	vector<std::shared_ptr<statement>> translate_units{};
+	while (!is_end())
+	{
+		translate_units.push_back(translate_unit());
+	}
+
+	return translate_units;
 }
 
 std::vector<std::shared_ptr<statement>> parser::translate_unit()

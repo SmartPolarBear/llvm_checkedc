@@ -87,7 +87,6 @@ private:
 		{"false", token_type::FALSE},
 		{"true", token_type::TRUE},
 		{"bool", token_type::BOOL},
-
 	};
 
 	void consume_line_comment();

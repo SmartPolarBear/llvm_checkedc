@@ -45,3 +45,4 @@ add_subdirectory(logger)
 
 add_subdirectory(scanner)
 add_subdirectory(parser)
+add_subdirectory(resolver)
