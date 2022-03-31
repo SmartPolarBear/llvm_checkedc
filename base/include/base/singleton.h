@@ -16,23 +16,52 @@
 
 #pragma once
 
+#include <concepts>
+#include <type_traits>
+#include <memory>
+
 namespace chclang::base
 {
 template<typename T>
 class singleton
 {
-public:
+ public:
 	static T& instance();
 
 	singleton(const singleton&) = delete;
 
 	singleton& operator=(const singleton&) = delete;
 
-protected:
+ protected:
 	singleton()
 	{
 	}
 };
+
+template<typename T>
+// requires std::derived_from<T, std::enable_shared_from_this<T>>
+class shared_ptr_singleton
+{
+ public:
+	static T& instance();
+
+	shared_ptr_singleton(const shared_ptr_singleton&) = delete;
+
+	shared_ptr_singleton& operator=(const shared_ptr_singleton&) = delete;
+
+ protected:
+	shared_ptr_singleton()
+	{
+	}
+};
+
+template<typename T>
+// requires std::derived_from<T, std::enable_shared_from_this<T>>
+T& shared_ptr_singleton<T>::instance()
+{
+	static T inst{};
+	return inst.shared_from_this();
+}
 
 template<typename T>
 T& singleton<T>::instance()

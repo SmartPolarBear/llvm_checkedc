@@ -25,7 +25,7 @@ enum class type_kind
 	CHAR,
 	SHORT,
 	INT,
-	LONG,
+	LONGLONG,
 	FLOAT,
 	DOUBLE,
 	LONG_DOUBLE,

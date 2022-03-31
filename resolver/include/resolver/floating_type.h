@@ -15,27 +15,49 @@
 //
 
 #pragma once
+#include "base/singleton.h"
 
 #include "resolver/type.h"
 
 namespace chclang::resolving
 {
 class float_type final
-	: public type
+	: public type,
+	  public std::enable_shared_from_this<float_type>,
+	  public base::shared_ptr_singleton<float_type>
 {
+ public:
+	[[nodiscard]] float_type()
+		: type(type_kind::FLOAT, 4)
+	{
 
+	}
 };
 
 class double_type final
-	: public type
+	: public type,
+	  public std::enable_shared_from_this<double_type>,
+	  public base::shared_ptr_singleton<double_type>
 {
+ public:
+	[[nodiscard]] double_type()
+		: type(type_kind::DOUBLE, 8)
+	{
 
+	}
 };
 
-class ldouble_type final
-	: public type
+class longdouble_type final
+	: public type,
+	  public std::enable_shared_from_this<longdouble_type>,
+	  public base::shared_ptr_singleton<longdouble_type>
 {
+ public:
+	[[nodiscard]] longdouble_type()
+		: type(type_kind::LONG_DOUBLE, 16)
+	{
 
+	}
 };
 
 }

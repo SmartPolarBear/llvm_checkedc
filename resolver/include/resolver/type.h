@@ -26,9 +26,21 @@
 namespace chclang::resolving
 {
 
+static inline constexpr size_t DEFAULT_ALIGNMENT = 8;
+
 class type
 {
-public:
+ public:
+	[[nodiscard]] constexpr type() = default;
+	[[nodiscard]] constexpr type(type_kind kind,
+		size_t size,
+		size_t alignment = DEFAULT_ALIGNMENT,
+		bool us = false,
+		bool atom = false)
+		: kind_(kind), size_(size), alignment_(alignment), unsigned_(us), atomic_(atom)
+	{
+	}
+
 	[[nodiscard]] type_kind kind() const
 	{
 		return kind_;
@@ -54,7 +66,7 @@ public:
 		return atomic_;
 	}
 
-private:
+ private:
 	type_kind kind_{};
 	size_t size_{};
 	size_t alignment_{};
