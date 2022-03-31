@@ -11,58 +11,31 @@
 //
 
 //
-// Created by cleve on 2/26/2022.
+// Created by cleve on 3/31/2022.
 //
-
 
 #pragma once
 
-namespace chclang::scanning
+#include "resolver/type.h"
+
+namespace chclang::resolving
 {
-enum class token_type
+class float_type final
+	: public type
 {
-	// Single-character tokens.
-	LEFT_PAREN, RIGHT_PAREN, LEFT_BRACKET /* [ */, RIGHT_BRACKET, LEFT_BRACE /* { */, RIGHT_BRACE,
-	COMMA, DOT,
-	SEMICOLON, COLON /* : */, SLASH,
-	QMARK /* ? */,
 
-	// One or two character tokens.
-	BANG, BANG_EQUAL,
-	EQUAL, EQUAL_EQUAL,
-	GREATER, GREATER_EQUAL,
-	LESS, LESS_EQUAL,
-	MINUS, MINUS_MINUS,
-	PLUS, PLUS_PLUS,
-	STAR, MOD,
-	BITWISE_AND, BITWISE_OR, BITWISE_XOR, BITWISE_NOT,
-
-	// Two character tokens
-	ARROW, /* -> */
-	AND, OR,
-	PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL,
-	MOD_EQUAL, BITWISE_AND_EQUAL, BITWISE_OR_EQUAL, BITWISE_XOR_EQUAL,
-
-	// Literals.
-	IDENTIFIER, STRING, CHAR_LITERAL,
-	INTEGER, FLOATING,
-
-	// Keywords.
-	AUTO, BREAK, CASE, CHAR, CONST, CONTINUE,
-	DEFAULT, DO, DOUBLE, ELSE, ENUM, EXTERN,
-	FLOAT, FOR, GOTO, IF, INLINE, INT, LONG,
-	RETURN, SHORT, SIGNED,
-	SIZEOF, STATIC, STRUCT, SWITCH, TYPEDEF, UNION,
-	UNSIGNED, VOID, VOLATILE, WHILE,
-
-	// C11 and above
-
-	ALIGNAS, ALIGNOF, ATOMIC, BOOL, COMPLEX, GENERIC,
-	IMAGINARY, NORETURN, STATICASSERT, THREADLOCAL,
-
-	// extension
-	FALSE, TRUE,
-
-	END_OF_FILE,
 };
+
+class double_type final
+	: public type
+{
+
+};
+
+class ldouble_type final
+	: public type
+{
+
+};
+
 }

@@ -26,12 +26,14 @@ namespace chclang::scanning
 
 
 using integer_literal_type = long long;
+using char_literal_type = char;
 using floating_literal_type = long double;
 using string_literal_type = std::string;
 using boolean_literal_type = bool;
 
 using literal_value_type = std::variant<
 		integer_literal_type,
+		char_literal_type,
 		floating_literal_type,
 		string_literal_type,
 		boolean_literal_type>;
