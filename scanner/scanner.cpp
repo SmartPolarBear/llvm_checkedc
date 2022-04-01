@@ -512,7 +512,15 @@ void chclang::scanning::scanner::scan_number_literal()
 			value |= (n == '1');
 		}
 
-		add_token(token_type::INTEGER, static_cast<integer_literal_type>(value));
+		if (auto type = scan_integral_postfix();type)
+		{
+			add_token(token_type::INTEGER, static_cast<integer_literal_type>(value), type);
+		}
+		else
+		{
+			type = infer_integral_type(static_cast<integer_literal_type>(value));
+			add_token(token_type::INTEGER, static_cast<integer_literal_type>(value), type);
+		}
 
 		return;
 	}
@@ -544,7 +552,8 @@ void chclang::scanning::scanner::scan_number_literal()
 	}
 	else if (floating)
 	{
-		add_token(token_type::FLOATING, std::stold(string{ lexeme() }));
+		auto type = scan_float_postfix();
+		add_token(token_type::FLOATING, std::stold(string{ lexeme() }), type);
 	}
 	else if (integral)
 	{
@@ -643,6 +652,22 @@ char chclang::scanning::scanner::scan_escaped_character()
 		default:
 			return c;
 		}
+	}
+}
+
+std::shared_ptr<resolving::type> chclang::scanning::scanner::scan_float_postfix()
+{
+	if (match('f') || match('F'))
+	{
+		return float_type::instance();
+	}
+	else if (match('l') || match('L'))
+	{
+		return longdouble_type::instance();
+	}
+	else
+	{
+		return double_type::instance();
 	}
 }
 

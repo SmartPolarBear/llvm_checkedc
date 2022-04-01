@@ -130,6 +130,8 @@ class scanner
 
 	std::shared_ptr<resolving::type> scan_integral_postfix();
 
+	std::shared_ptr<resolving::type> scan_float_postfix();
+
 	std::shared_ptr<resolving::type> infer_integral_type(integer_literal_type val);
 
 	void scan_number_literal();
