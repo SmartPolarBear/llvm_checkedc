@@ -18,6 +18,9 @@
 #include "logger/logger.h"
 #include "scanner/scanner.h"
 
+#include "resolver/integral_type.h"
+#include "resolver/floating_type.h"
+
 #include <cctype>
 #include <sstream>
 
@@ -26,6 +29,7 @@ using namespace std;
 using namespace chclang;
 using namespace chclang::exceptions;
 using namespace chclang::logging;
+using namespace chclang::resolving;
 
 bool chclang::scanning::scanner::is_digit(char c)
 {
@@ -148,10 +152,12 @@ std::string chclang::scanning::scanner::lexeme()
 	return src_.substr(start_, cur_ - start_);
 }
 
-void chclang::scanning::scanner::add_token(chclang::scanning::token_type type, optional<literal_value_type> lit)
+void chclang::scanning::scanner::add_token(chclang::scanning::token_type type,
+	optional<literal_value_type> lit,
+	std::shared_ptr<resolving::type> t)
 {
 	source_information src_info{ line_, col_ };
-	tokens_.emplace_back(type, lexeme(), lit, src_info);
+	tokens_.emplace_back(type, lexeme(), lit, src_info, t);
 }
 
 vector<chclang::scanning::token> chclang::scanning::scanner::scan()
@@ -542,7 +548,16 @@ void chclang::scanning::scanner::scan_number_literal()
 	}
 	else if (integral)
 	{
-		//auto val = std::stoll(string{ lexeme()} );
+		auto val = std::stoll(string{ lexeme() });
+		if (auto type = scan_integral_postfix();type)
+		{
+			add_token(token_type::INTEGER, val, type);
+		}
+		else
+		{
+			type = infer_integral_type(val);
+			add_token(token_type::INTEGER, val, type);
+		}
 	}
 	else
 	{
@@ -638,14 +653,46 @@ shared_ptr<chclang::resolving::type> chclang::scanning::scanner::scan_integral_p
 		match("ull") || match("uLL") ||
 		match("ULL") || match("Ull"))
 	{
-
+		return ulonglong_type::instance();
 	}
-	return shared_ptr<resolving::type>();
+	else if (match("ul") || match("lu"))
+	{
+		return uint_type::instance();
+	}
+	else if (match("ll") || match("LL"))
+	{
+		return longlong_type::instance();
+	}
+	else if (match('l') || match('L'))
+	{
+		return int_type::instance();
+	}
+	else if (match('u') || match('U'))
+	{
+		return uint_type::instance();
+	}
+
+	return nullptr;
 }
 
 shared_ptr<resolving::type> chclang::scanning::scanner::infer_integral_type(chclang::scanning::integer_literal_type val)
 {
-	return shared_ptr<resolving::type>();
+	if (val >> 63)
+	{
+		return ulonglong_type::instance();
+	}
+	else if (val >> 32)
+	{
+		return longlong_type::instance();
+	}
+	else if (val >> 31)
+	{
+		return uint_type::instance();
+	}
+	else
+	{
+		return int_type::instance();
+	}
 }
 
 

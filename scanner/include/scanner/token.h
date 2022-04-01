@@ -19,11 +19,12 @@
 #include "scanner/token_type.h"
 #include "scanner/source_information.h"
 
+#include "resolver/type.h"
+
 #include <optional>
 
 namespace chclang::scanning
 {
-
 
 using integer_literal_type = long long;
 using char_literal_type = char;
@@ -32,25 +33,26 @@ using string_literal_type = std::string;
 using boolean_literal_type = bool;
 
 using literal_value_type = std::variant<
-		integer_literal_type,
-		char_literal_type,
-		floating_literal_type,
-		string_literal_type,
-		boolean_literal_type>;
-
+	integer_literal_type,
+	char_literal_type,
+	floating_literal_type,
+	string_literal_type,
+	boolean_literal_type>;
 
 class token final
 {
-public:
+ public:
 
 	[[nodiscard]] explicit token(token_type t,
-			std::string lexeme,
-			std::optional<literal_value_type> lit,
-			source_information src_info)
-			: type_(t),
-			  lexeme_(std::move(lexeme)),
-			  literal_(std::move(lit)),
-			  source_info_(std::move(src_info))
+		std::string lexeme,
+		std::optional<literal_value_type> lit,
+		source_information src_info,
+		std::shared_ptr<resolving::type> tp = nullptr)
+		: token_type_(t),
+		  lexeme_(std::move(lexeme)),
+		  literal_(std::move(lit)),
+		  source_info_(std::move(src_info)),
+		  type_(std::move(tp))
 	{
 	}
 
@@ -62,9 +64,9 @@ public:
 
 	token& operator=(const token&) = default;
 
-	[[nodiscard]]token_type type() const
+	[[nodiscard]]chclang::scanning::token_type token_type() const
 	{
-		return type_;
+		return token_type_;
 	}
 
 	[[nodiscard]]std::string lexeme() const
@@ -82,10 +84,17 @@ public:
 		return source_info_;
 	}
 
-private:
-	token_type type_;
+	[[nodiscard]] std::shared_ptr<resolving::type> type() const
+	{
+		return type_;
+	}
+
+ private:
+	chclang::scanning::token_type token_type_;
 	std::string lexeme_;
 	std::optional<literal_value_type> literal_;
 	source_information source_info_;
+
+	std::shared_ptr<resolving::type> type_{};
 };
 }

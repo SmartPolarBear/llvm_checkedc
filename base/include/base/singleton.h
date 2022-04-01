@@ -43,7 +43,7 @@ template<typename T>
 class shared_ptr_singleton
 {
  public:
-	static T& instance();
+	static std::shared_ptr<T> instance();
 
 	shared_ptr_singleton(const shared_ptr_singleton&) = delete;
 
@@ -57,7 +57,7 @@ class shared_ptr_singleton
 
 template<typename T>
 // requires std::derived_from<T, std::enable_shared_from_this<T>>
-T& shared_ptr_singleton<T>::instance()
+std::shared_ptr<T> shared_ptr_singleton<T>::instance()
 {
 	static T inst{};
 	return inst.shared_from_this();
