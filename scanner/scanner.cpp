@@ -473,7 +473,7 @@ void chclang::scanning::scanner::scan_char()
 	else
 	{
 		advance();
-		add_token(token_type::CHAR_LITERAL, lit);
+		add_token(token_type::CHAR_LITERAL, lit, char_type::instance());
 	}
 }
 
