@@ -20,6 +20,7 @@
 
 #include "resolver/integral_type.h"
 #include "resolver/floating_type.h"
+#include "resolver/array_type.h"
 
 #include <cctype>
 #include <sstream>
@@ -421,9 +422,8 @@ void chclang::scanning::scanner::scan_string()
 		{
 			line_++;
 		}
-		else if (c == '\\')
+		else if (match('\\'))
 		{
-			advance();
 			val += scan_escaped_character();
 		}
 		else
@@ -440,7 +440,10 @@ void chclang::scanning::scanner::scan_string()
 
 	advance(); // eat the closing "
 
-	add_token(token_type::STRING, val);
+	add_token(token_type::STRING, val,
+		array_type::array_of(char_type::instance(),
+			val.size() + 1 // for null termination
+		));
 }
 
 void chclang::scanning::scanner::scan_char()
@@ -479,12 +482,8 @@ void chclang::scanning::scanner::scan_char()
 
 void chclang::scanning::scanner::scan_number_literal()
 {
-	if (peek() == '0' && (peek(1) == 'b' || peek(1) == 'B')) // binary literal should be handled mannually
+	if (match("0b") || match("0B")) // binary literal should be handled mannually
 	{
-		// eat 0b/B
-		advance();
-		advance();
-
 		if (!is_number_literal_component(peek()))
 		{
 			logging::logger::instance().error(current_source_information(),

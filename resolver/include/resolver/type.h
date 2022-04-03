@@ -41,6 +41,9 @@ class type
 	{
 	}
 
+	type(const type&) = default;
+	type& operator=(const type&) = default;
+
 	[[nodiscard]] type_kind kind() const
 	{
 		return kind_;

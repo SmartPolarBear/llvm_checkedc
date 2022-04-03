@@ -20,7 +20,40 @@
 
 #include "resolver/type.h"
 
+#include <memory>
+
+#include <gsl/gsl>
+
 namespace chclang::resolving
 {
+class array_type final
+	: public type,
+	  public std::enable_shared_from_this<array_type>
+{
+ public:
+	using size_type = size_t;
 
+	~array_type() = default;
+	array_type(const array_type&) = default;
+	array_type& operator=(const array_type&) = default;
+
+	static std::shared_ptr<array_type> array_of(const std::shared_ptr<type>& base, size_type size);
+
+	[[nodiscard]] std::shared_ptr<type> base() const
+	{
+		return base_;
+	}
+
+	[[nodiscard]] size_type array_size() const
+	{
+		return array_size_;
+	}
+
+ protected:
+	array_type(std::shared_ptr<type> base, size_type size);
+
+ private:
+	std::shared_ptr<type> base_{};
+	size_type array_size_{};
+};
 }

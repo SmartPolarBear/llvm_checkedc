@@ -15,3 +15,18 @@
 //
 
 #include "resolver/array_type.h"
+
+using namespace chclang::resolving;
+
+using namespace std;
+
+std::shared_ptr<array_type> chclang::resolving::array_type::array_of(const std::shared_ptr<type>& base,
+	chclang::resolving::array_type::size_type size)
+{
+	return shared_ptr<array_type>(new array_type{ base, size });
+}
+
+chclang::resolving::array_type::array_type(std::shared_ptr<type> base, chclang::resolving::array_type::size_type size)
+	: type(*base), base_(std::move(base)), array_size_(size)
+{
+}
