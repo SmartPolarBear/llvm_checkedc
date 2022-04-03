@@ -22,6 +22,7 @@
 #include "resolver/type.h"
 
 #include <optional>
+#include <variant>
 
 namespace chclang::scanning
 {

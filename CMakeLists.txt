@@ -18,13 +18,15 @@ add_executable(chclang main.cpp)
 target_include_directories(chclang
         PRIVATE include)
 
-# Use libc++ instead of libstdc++
+# Use libc++ instead of libstdc++ for clang
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 target_compile_options(chclang
         PRIVATE -stdlib=libc++)
 
 target_link_options(chclang
         PRIVATE -stdlib=libc++
         PRIVATE -lc++abi)
+endif()
 
 add_subdirectory(libs)
 

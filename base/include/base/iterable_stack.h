@@ -17,6 +17,7 @@
 #pragma once
 
 #include <stack>
+#include <vector>
 
 namespace chclang::base
 {

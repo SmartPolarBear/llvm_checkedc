@@ -6,10 +6,12 @@
 // Check the libc++ version
 #include <version>
 
+#ifdef __clang__ // clang request libc++
 #ifndef _LIBCPP_VERSION
 #error "chclang must be link against libc++"
 #elif _LIBCPP_VERSION < 13000
-#error "chclang must be link against libc++-13 and above
+#error "chclang must be link against libc++-13 and above"
+#endif
 #endif
 
 #include <string_view>
