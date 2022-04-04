@@ -132,8 +132,6 @@ class scanner
 
 	std::shared_ptr<resolving::type> scan_float_postfix();
 
-	std::shared_ptr<resolving::type> infer_integral_type(integer_literal_type val);
-
 	void scan_number_literal();
 
 	void scan_identifier();
@@ -156,6 +154,8 @@ class scanner
 		std::shared_ptr<resolving::type> t = nullptr);
 
 	char advance();
+
+	static std::shared_ptr<resolving::type> infer_integral_type(integer_literal_type val);
 
 	[[nodiscard]] char peek(size_t n = 0);
 

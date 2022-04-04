@@ -37,7 +37,7 @@ class array_type final
 	array_type(const array_type&) = default;
 	array_type& operator=(const array_type&) = default;
 
-	static std::shared_ptr<array_type> array_of(const std::shared_ptr<type>& base, size_type size);
+	static std::shared_ptr<array_type> array_of(const std::shared_ptr<type>& base, size_type array_size);
 
 	[[nodiscard]] std::shared_ptr<type> base() const
 	{

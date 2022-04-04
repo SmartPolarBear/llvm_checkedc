@@ -453,11 +453,10 @@ void chclang::scanning::scanner::scan_char()
 	{
 		lit = scan_escaped_character();
 	}
-	else if (peek() == '\'')
+	else if (match('\''))
 	{
 		logging::logger::instance().error(current_source_information(),
 			fmt::format("Empty character literal ."));
-		advance();
 	}
 
 	if (peek() != '\'')
@@ -466,6 +465,7 @@ void chclang::scanning::scanner::scan_char()
 		{
 			advance();
 		}
+
 		advance();
 
 		auto full = src_.substr(start_ + 1, cur_ - start_ - 2);
