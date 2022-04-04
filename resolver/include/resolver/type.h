@@ -29,7 +29,6 @@ namespace chclang::resolving
 static inline constexpr size_t POINTER_SIZE = 8;
 static inline constexpr size_t POINTER_ALIGNMENT = 8;
 
-
 static inline constexpr size_t DEFAULT_ALIGNMENT = 8;
 
 class type
@@ -47,6 +46,7 @@ class type
 
 	type(const type&) = default;
 	type& operator=(const type&) = default;
+	virtual ~type() = default;
 
 	[[nodiscard]] type_kind kind() const
 	{
@@ -73,6 +73,14 @@ class type
 		return atomic_;
 	}
 
+	virtual std::shared_ptr<type> derive() = 0;
+
+ protected:
+	void origin_from(std::shared_ptr<type> t)
+	{
+		origin_ = std::weak_ptr<type>{ t };
+	}
+
  private:
 	type_kind kind_{};
 	size_t size_{};
@@ -81,8 +89,16 @@ class type
 	bool unsigned_{};
 	bool atomic_{};
 
-	std::weak_ptr<type> origin_{};
 	std::weak_ptr<type> base_{};
+
+	std::weak_ptr<type> origin_{};
 };
+
+#define DEFAULT_DERIVE(typename) \
+virtual std::shared_ptr<type> derive() override{ \
+    auto ret=std::shared_ptr<typename>(new typename{*this}); \
+    ret->origin_from(this->shared_from_this()) ;              \
+    return ret;                    \
+}\
 
 }

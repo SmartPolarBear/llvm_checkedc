@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "base/singleton.h"
-
 #include "resolver/type.h"
 
 #include <memory>
@@ -48,6 +46,8 @@ class array_type final
 	{
 		return array_size_;
 	}
+
+	DEFAULT_DERIVE(array_type);
 
  protected:
 	array_type(std::shared_ptr<type> base, size_type arr_size);

@@ -441,7 +441,7 @@ void chclang::scanning::scanner::scan_string()
 	advance(); // eat the closing "
 
 	add_token(token_type::STRING, val,
-		array_type::array_of(char_type::instance(),
+		array_type::array_of(char_type::make(),
 			val.size() + 1 // for null termination
 		));
 }
@@ -476,7 +476,7 @@ void chclang::scanning::scanner::scan_char()
 	else
 	{
 		advance();
-		add_token(token_type::CHAR_LITERAL, lit, char_type::instance());
+		add_token(token_type::CHAR_LITERAL, lit, char_type::make());
 	}
 }
 
@@ -658,15 +658,15 @@ std::shared_ptr<resolving::type> chclang::scanning::scanner::scan_float_postfix(
 {
 	if (match('f') || match('F'))
 	{
-		return float_type::instance();
+		return float_type::make();
 	}
 	else if (match('l') || match('L'))
 	{
-		return longdouble_type::instance();
+		return longdouble_type::make();
 	}
 	else
 	{
-		return double_type::instance();
+		return double_type::make();
 	}
 }
 
@@ -677,23 +677,23 @@ shared_ptr<chclang::resolving::type> chclang::scanning::scanner::scan_integral_p
 		match("ull") || match("uLL") ||
 		match("ULL") || match("Ull"))
 	{
-		return ulonglong_type::instance();
+		return ulonglong_type::make();
 	}
 	else if (match("ul") || match("lu"))
 	{
-		return uint_type::instance();
+		return uint_type::make();
 	}
 	else if (match("ll") || match("LL"))
 	{
-		return longlong_type::instance();
+		return longlong_type::make();
 	}
 	else if (match('l') || match('L'))
 	{
-		return int_type::instance();
+		return int_type::make();
 	}
 	else if (match('u') || match('U'))
 	{
-		return uint_type::instance();
+		return uint_type::make();
 	}
 
 	return nullptr;
@@ -703,19 +703,19 @@ shared_ptr<resolving::type> chclang::scanning::scanner::infer_integral_type(chcl
 {
 	if (val >> 63)
 	{
-		return ulonglong_type::instance();
+		return ulonglong_type::make();
 	}
 	else if (val >> 32)
 	{
-		return longlong_type::instance();
+		return longlong_type::make();
 	}
 	else if (val >> 31)
 	{
-		return uint_type::instance();
+		return uint_type::make();
 	}
 	else
 	{
-		return int_type::instance();
+		return int_type::make();
 	}
 }
 

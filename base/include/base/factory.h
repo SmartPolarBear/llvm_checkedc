@@ -11,58 +11,29 @@
 //
 
 //
-// Created by cleve on 3/31/2022.
+// Created by cleve on 4/4/2022.
 //
 
 #pragma once
-#include "base/factory.h"
 
-#include "resolver/type.h"
+#include <concepts>
+#include <type_traits>
+#include <memory>
 
-namespace chclang::resolving
+namespace chclang::base
 {
-class float_type final
-	: public type,
-	  public std::enable_shared_from_this<float_type>,
-	  public base::factory<float_type>
-{
- public:
-	[[nodiscard]] float_type()
-		: type(type_kind::FLOAT, 4)
-	{
-	}
-
-	DEFAULT_DERIVE(float_type);
-};
-
-class double_type final
-	: public type,
-	  public std::enable_shared_from_this<double_type>,
-	  public base::factory<double_type>
+template<typename T, typename Pointer=std::shared_ptr<T>>
+class factory
 {
  public:
-	[[nodiscard]] double_type()
-		: type(type_kind::DOUBLE, 8)
+	factory() = default;
+	factory(const factory&) = default;
+	virtual ~factory() = default;
+
+	template<class... Args>
+	static Pointer make(Args&& ... args)
 	{
-
+		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
-
-	DEFAULT_DERIVE(double_type);
 };
-
-class longdouble_type final
-	: public type,
-	  public std::enable_shared_from_this<longdouble_type>,
-	  public base::factory<longdouble_type>
-{
- public:
-	[[nodiscard]] longdouble_type()
-		: type(type_kind::LONG_DOUBLE, 16)
-	{
-
-	}
-
-	DEFAULT_DERIVE(longdouble_type);
-};
-
 }

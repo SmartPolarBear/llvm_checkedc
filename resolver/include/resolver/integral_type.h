@@ -17,6 +17,7 @@
 #pragma once
 
 #include "base/singleton.h"
+#include "base/factory.h"
 
 #include "resolver/type.h"
 
@@ -25,19 +26,21 @@ namespace chclang::resolving
 class boolean_type final
 	: public type,
 	  public std::enable_shared_from_this<boolean_type>,
-	  public base::shared_ptr_singleton<boolean_type>
+	  public base::factory<boolean_type>
 {
  public:
 	[[nodiscard]] boolean_type()
 		: type(type_kind::BOOL, 1)
 	{
 	}
+
+	DEFAULT_DERIVE(boolean_type);
 };
 
 class char_type final
 	: public type,
 	  public std::enable_shared_from_this<char_type>,
-	  public base::shared_ptr_singleton<char_type>
+	  public base::factory<char_type>
 {
  public:
 	[[nodiscard]] char_type()
@@ -45,12 +48,15 @@ class char_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(char_type);
+
 };
 
 class short_type final
 	: public type,
 	  public std::enable_shared_from_this<short_type>,
-	  public base::shared_ptr_singleton<short_type>
+	  public base::factory<short_type>
 {
 
  public:
@@ -59,12 +65,15 @@ class short_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(short_type);
+
 };
 
 class int_type final
 	: public type,
 	  public std::enable_shared_from_this<int_type>,
-	  public base::shared_ptr_singleton<int_type>
+	  public base::factory<int_type>
 {
  public:
 	[[nodiscard]] int_type()
@@ -72,12 +81,15 @@ class int_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(int_type);
+
 };
 
 class longlong_type final
 	: public type,
 	  public std::enable_shared_from_this<longlong_type>,
-	  public base::shared_ptr_singleton<longlong_type>
+	  public base::factory<longlong_type>
 {
  public:
 	[[nodiscard]] longlong_type()
@@ -85,12 +97,15 @@ class longlong_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(longlong_type);
+
 };
 
 class uchar_type final
 	: public type,
 	  public std::enable_shared_from_this<uchar_type>,
-	  public base::shared_ptr_singleton<uchar_type>
+	  public base::factory<uchar_type>
 {
  public:
 	[[nodiscard]] uchar_type()
@@ -98,12 +113,15 @@ class uchar_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(uchar_type);
+
 };
 
 class ushort_type final
 	: public type,
 	  public std::enable_shared_from_this<ushort_type>,
-	  public base::shared_ptr_singleton<ushort_type>
+	  public base::factory<ushort_type>
 {
  public:
 	[[nodiscard]] ushort_type()
@@ -111,12 +129,15 @@ class ushort_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(ushort_type);
+
 };
 
 class uint_type final
 	: public type,
 	  public std::enable_shared_from_this<uint_type>,
-	  public base::shared_ptr_singleton<uint_type>
+	  public base::factory<uint_type>
 {
  public:
 	[[nodiscard]] uint_type()
@@ -124,12 +145,15 @@ class uint_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(uint_type);
+
 };
 
 class ulonglong_type final
 	: public type,
 	  public std::enable_shared_from_this<ulonglong_type>,
-	  public base::shared_ptr_singleton<ulonglong_type>
+	  public base::factory<ulonglong_type>
 {
  public:
 	[[nodiscard]] ulonglong_type()
@@ -137,6 +161,9 @@ class ulonglong_type final
 	{
 
 	}
+
+	DEFAULT_DERIVE(ulonglong_type);
+
 };
 
 }

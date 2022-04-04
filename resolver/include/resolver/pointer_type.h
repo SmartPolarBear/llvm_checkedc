@@ -15,8 +15,6 @@
 //
 #pragma once
 
-#include "base/singleton.h"
-
 #include "resolver/type.h"
 
 #include <memory>
@@ -42,6 +40,8 @@ class pointer_type final
 	{
 		return base_;
 	}
+
+	DEFAULT_DERIVE(pointer_type);
 
  protected:
 	explicit pointer_type(std::shared_ptr<type> base);
