@@ -11,23 +11,21 @@
 //
 
 //
-// Created by cleve on 4/1/2022.
+// Created by cleve on 4/4/2022.
 //
 
-#include "resolver/array_type.h"
+#include <resolver/pointer_type.h>
 
 using namespace chclang::resolving;
 
 using namespace std;
 
-std::shared_ptr<array_type> chclang::resolving::array_type::array_of(const std::shared_ptr<type>& base,
-	chclang::resolving::array_type::size_type size)
+std::shared_ptr<pointer_type> chclang::resolving::pointer_type::pointer_to(const std::shared_ptr<type>& base)
 {
-	return shared_ptr<array_type>(new array_type{ base, size });
+	return shared_ptr<pointer_type>(new pointer_type{ base });
 }
 
-chclang::resolving::array_type::array_type(std::shared_ptr<type> base,
-	chclang::resolving::array_type::size_type arr_size)
-	: type(type_kind::ARRAY, base->size() * arr_size, base->alignment()), base_(std::move(base)), array_size_(arr_size)
+chclang::resolving::pointer_type::pointer_type(std::shared_ptr<type> base)
+	: type(type_kind::PTR, POINTER_SIZE, POINTER_ALIGNMENT, true), base_(std::move(base))
 {
 }

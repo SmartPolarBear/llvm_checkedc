@@ -11,23 +11,42 @@
 //
 
 //
-// Created by cleve on 4/1/2022.
+// Created by cleve on 4/4/2022.
 //
+#pragma once
 
-#include "resolver/array_type.h"
+#include "base/singleton.h"
 
-using namespace chclang::resolving;
+#include "resolver/type.h"
 
-using namespace std;
+#include <memory>
 
-std::shared_ptr<array_type> chclang::resolving::array_type::array_of(const std::shared_ptr<type>& base,
-	chclang::resolving::array_type::size_type size)
+#include <gsl/gsl>
+
+namespace chclang::resolving
 {
-	return shared_ptr<array_type>(new array_type{ base, size });
-}
-
-chclang::resolving::array_type::array_type(std::shared_ptr<type> base,
-	chclang::resolving::array_type::size_type arr_size)
-	: type(type_kind::ARRAY, base->size() * arr_size, base->alignment()), base_(std::move(base)), array_size_(arr_size)
+class pointer_type final
+	: public type,
+	  public std::enable_shared_from_this<pointer_type>
 {
+ public:
+	using size_type = size_t;
+
+	~pointer_type() = default;
+	pointer_type(const pointer_type&) = default;
+	pointer_type& operator=(const pointer_type&) = default;
+
+	static std::shared_ptr<pointer_type> pointer_to(const std::shared_ptr<type>& base);
+
+	[[nodiscard]] std::shared_ptr<type> base() const
+	{
+		return base_;
+	}
+
+ protected:
+	explicit pointer_type(std::shared_ptr<type> base);
+
+ private:
+	std::shared_ptr<type> base_{};
+};
 }

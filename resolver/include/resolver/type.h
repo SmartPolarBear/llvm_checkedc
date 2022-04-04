@@ -26,6 +26,10 @@
 namespace chclang::resolving
 {
 
+static inline constexpr size_t POINTER_SIZE = 8;
+static inline constexpr size_t POINTER_ALIGNMENT = 8;
+
+
 static inline constexpr size_t DEFAULT_ALIGNMENT = 8;
 
 class type

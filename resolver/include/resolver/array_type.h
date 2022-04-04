@@ -50,7 +50,7 @@ class array_type final
 	}
 
  protected:
-	array_type(std::shared_ptr<type> base, size_type size);
+	array_type(std::shared_ptr<type> base, size_type arr_size);
 
  private:
 	std::shared_ptr<type> base_{};
