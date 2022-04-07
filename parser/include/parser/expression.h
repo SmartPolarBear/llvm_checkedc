@@ -25,18 +25,24 @@ namespace chclang::parsing
 
 enum storage_class_offs
 {
-	STORAGE_CLASS_TYPEDEF_OFF,
+	STORAGE_CLASS_TYPEDEF_OFF = 0,
 	STORAGE_CLASS_EXTERN_OFF,
 	STORAGE_CLASS_STATIC_OFF,
-	STORAGE_CLASS_AUTO_OFF
+	STORAGE_CLASS_AUTO_OFF,
+	STORAGE_CLASS_INLINE_OFF,
+	STORAGE_CLASS_THREAD_LOCAL_OFF
 };
 
-using storage_class = uint32_t;
+struct variable_attributes
+{
+	uint32_t storage_class;
+	size_t alignment;
+};
 
 class expression
 {
-public:
-	virtual llvm::Value *codegen() = 0;
-	virtual llvm::Type *type() = 0;
+ public:
+	virtual llvm::Value* codegen() = 0;
+	virtual llvm::Type* type() = 0;
 };
 }

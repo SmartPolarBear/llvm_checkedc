@@ -19,6 +19,9 @@
 #include "parser/parser.h"
 #include "parser/visitor.h"
 
+#include <bitset>
+
+using namespace chclang;
 using namespace chclang::scanning;
 using namespace chclang::parsing;
 using namespace chclang::exceptions;
@@ -26,38 +29,9 @@ using namespace chclang::exceptions;
 using namespace std;
 
 chclang::parsing::parser::parser(std::vector<scanning::token> tks)
-		: tokens_(std::move(tks))
+	: tokens_(std::move(tks))
 {
-}
-
-chclang::parsing::storage_class chclang::parsing::parser::storage_class_specifier()
-{
-	chclang::parsing::storage_class ret{ 0 };
-	while (match({ token_type::TYPEDEF, token_type::EXTERN, token_type::STATIC, token_type::AUTO }))
-	{
-		auto sc = previous();
-		switch (sc.token_type())
-		{
-		case token_type::TYPEDEF:
-			ret |= (1 << STORAGE_CLASS_TYPEDEF_OFF);
-			break;
-		case token_type::EXTERN:
-			ret |= (1 << STORAGE_CLASS_EXTERN_OFF);
-			break;
-		case token_type::STATIC:
-			ret |= (1 << STORAGE_CLASS_STATIC_OFF);
-			break;
-		case token_type::AUTO:
-			ret |= (1 << STORAGE_CLASS_AUTO_OFF);
-			break;
-
-			[[unlikely]]default:
-			// NOT POSSIBLE TO REACH HERE
-			assert(false);
-			break;
-		}
-	}
-	return ret;
+	// TODO: define builtin functions
 }
 
 void parser::synchronize()
@@ -126,7 +100,7 @@ chclang::exceptions::parse_error parser::error(const scanning::token& t, const s
 
 bool parser::match(std::initializer_list<scanning::token_type> types, gsl::index next)
 {
-	for (const auto& t: types)
+	for (const auto& t : types)
 	{
 		if (check(t, next))
 		{
@@ -148,26 +122,26 @@ bool parser::check(chclang::scanning::token_type t, gsl::index next)
 
 chclang::scanning::token parser::peek(gsl::index offset)
 {
-	return tokens_.at(current_.current_token + offset);
+	return tokens_.at(current_token_ + offset);
 }
 
 chclang::scanning::token parser::advance()
 {
 	if (!is_end())
 	{
-		current_.current_token++;
+		current_token_++;
 	}
 	return previous();
 }
 
 bool parser::is_end() const
 {
-	return tokens_[current_.current_token].token_type() == scanning::token_type::END_OF_FILE;
+	return tokens_[current_token_].token_type() == scanning::token_type::END_OF_FILE;
 }
 
 chclang::scanning::token parser::previous()
 {
-	return tokens_.at(current_.current_token - 1);
+	return tokens_.at(current_token_ - 1);
 }
 
 std::vector<std::shared_ptr<statement>> parser::parse()
@@ -175,8 +149,115 @@ std::vector<std::shared_ptr<statement>> parser::parse()
 	vector<std::shared_ptr<statement>> stmts{};
 	while (!is_end())
 	{
+		auto [base_type, sc, next] = declspec();
 	}
 
 	return stmts;
 }
+
+scanning::token parser::current()
+{
+	return tokens_[current_token_];
+}
+
+bool parser::is_typename(const token& tk)
+{
+	if (tk.lexeme() == "void" || tk.lexeme() == "_Bool" ||
+		tk.lexeme() == "bool" || tk.lexeme() == "char" ||
+		tk.lexeme() == "short" || tk.lexeme() == "int" ||
+		tk.lexeme() == "long" || tk.lexeme() == "struct" ||
+		tk.lexeme() == "union" || tk.lexeme() == "typedef" ||
+		tk.lexeme() == "enum" || tk.lexeme() == "static" ||
+		tk.lexeme() == "extern" || tk.lexeme() == "_Alignas" ||
+		tk.lexeme() == "signed" || tk.lexeme() == "unsigned" ||
+		tk.lexeme() == "const" || tk.lexeme() == "volatile" ||
+		tk.lexeme() == "auto" || tk.lexeme() == "register" ||
+		tk.lexeme() == "restrict" || tk.lexeme() == "__restrict" ||
+		tk.lexeme() == "__restrict__" || tk.lexeme() == "_Noreturn" ||
+		tk.lexeme() == "float" || tk.lexeme() == "double" ||
+		tk.lexeme() == "typeof" || tk.lexeme() == "inline" ||
+		tk.lexeme() == "_Thread_local" || tk.lexeme() == "__thread" ||
+		tk.lexeme() == "_Atomic")
+	{
+		return true;
+	}
+	else if (find_typedef(current()))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+std::shared_ptr<resolving::type> parser::find_typedef(const token& tk)
+{
+	return std::shared_ptr<resolving::type>();
+}
+
+parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::declspec()
+{
+	// Use for counter for various combos of internal types
+	enum : uint32_t
+	{
+		VOID = 1 << 0,
+		BOOL = 1 << 2,
+		CHAR = 1 << 4,
+		SHORT = 1 << 6,
+		INT = 1 << 8,
+		LONG = 1 << 10,
+		FLOAT = 1 << 12,
+		DOUBLE = 1 << 14,
+		OTHER = 1 << 16,
+		SIGNED = 1 << 17,
+		UNSIGNED = 1 << 18,
+	};
+
+	chclang::parsing::variable_attributes attr{ 0 };
+	while (is_typename(current()))
+	{
+		if (match({ token_type::TYPEDEF, token_type::EXTERN, token_type::STATIC, token_type::AUTO }))
+		{
+			auto sc = previous();
+			switch (sc.token_type())
+			{
+			case token_type::TYPEDEF:
+				attr.storage_class |= (1 << STORAGE_CLASS_TYPEDEF_OFF);
+				break;
+			case token_type::EXTERN:
+				attr.storage_class |= (1 << STORAGE_CLASS_EXTERN_OFF);
+				break;
+			case token_type::STATIC:
+				attr.storage_class |= (1 << STORAGE_CLASS_STATIC_OFF);
+				break;
+			case token_type::AUTO:
+				attr.storage_class |= (1 << STORAGE_CLASS_AUTO_OFF);
+				break;
+			case token_type::INLINE:
+				attr.storage_class |= (1 << STORAGE_CLASS_INLINE_OFF);
+				break;
+			case token_type::THREADLOCAL:
+				attr.storage_class |= (1 << STORAGE_CLASS_THREAD_LOCAL_OFF);
+				break;
+			}
+
+			if ((attr.storage_class & (1 << STORAGE_CLASS_TYPEDEF_OFF)) && (attr.storage_class & 0b11110))
+			{
+				error(previous(), "Redundant typedef specifier.");
+			}
+		}
+
+		if (match({ token_type::CONST, token_type::VOLATILE, token_type::AUTO,
+					token_type::NORETURN }))
+		{
+			// Do nothing now
+		}
+
+		
+	}
+
+}
+
+
+
+
 

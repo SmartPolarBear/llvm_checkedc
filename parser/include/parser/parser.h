@@ -18,11 +18,16 @@
 
 #include "base/iterable_stack.h"
 #include "base/exceptions.h"
+
 #include "parser/statement.h"
 #include "parser/expression.h"
+
 #include "scanner/token.h"
 
+#include "resolver/type.h"
+
 #include <vector>
+#include <tuple>
 
 #include <gsl/gsl>
 
@@ -30,52 +35,31 @@ namespace chclang::parsing
 {
 class parser
 {
-public:
+ public:
+	template<typename... T>
+	using recoverable = std::tuple<T..., gsl::index>;
+
 	explicit parser(std::vector<scanning::token> tks);
 
 	std::vector<std::shared_ptr<statement>> parse();
-private:
-	struct parser_state
-	{
-		gsl::index current_token;
-	};
+ private:
 
-	/// translate_unit -> external_declaration*
-	std::vector<std::shared_ptr<statement>> translate_unit();
+	recoverable<std::shared_ptr<resolving::type>, variable_attributes> declspec();
 
-	/// external_declaration -> function_definition | declaration
-	std::shared_ptr<statement> external_declaration();
+	bool is_typename(const scanning::token &tk);
 
-	/// function_definition -> declaration_specifiers declarator declaration_list compound_statement
-	std::shared_ptr<statement> function_definition();
-
-	/// declaration_specifiers -> (storage_class_specifier|type_specifier|type_qualifier|function_specifier)*
-	std::shared_ptr<statement> declaration_specifiers();
-
-	/// storage_class_specifier -> typedef|extern|static
-	storage_class storage_class_specifier();
-
-	std::shared_ptr<statement> declaration();
-
-	// for backtracking
-	void push_state();
-
-	parser_state pop_state();
-
-	void restore_state();
-
-	void accept_state();
+	std::shared_ptr<resolving::type> find_typedef(const scanning::token &tk);
 
 	// for error recovery
 	void synchronize();
 
 	// for error report
-	[[nodiscard]] exceptions::parse_error error(const scanning::token &t, const std::string &msg);
+	[[nodiscard]] exceptions::parse_error error(const scanning::token& t, const std::string& msg);
 
 	// TODO: warnings
 
 	// for token reading and matching
-	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string &msg);
+	[[nodiscard]] scanning::token consume(scanning::token_type t, const std::string& msg);
 
 	[[nodiscard]] bool match(std::initializer_list<scanning::token_type> types, gsl::index next = 0);
 
@@ -85,14 +69,14 @@ private:
 
 	[[nodiscard]] scanning::token advance();
 
+	[[nodiscard]] scanning::token current();
+
 	[[nodiscard]] bool is_end() const;
 
 	[[nodiscard]] scanning::token previous();
 
 	std::vector<scanning::token> tokens_{};
 
-	base::iterable_stack<parser_state> states_{};
-
-	parser_state current_{};
+	gsl::index current_token_{};
 };
 }
