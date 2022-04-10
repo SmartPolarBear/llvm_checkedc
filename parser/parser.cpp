@@ -191,7 +191,12 @@ bool parser::is_typename(const token& tk)
 
 std::shared_ptr<resolving::type> parser::find_typedef(const token& tk)
 {
-	return std::shared_ptr<resolving::type>();
+	if (tk.token_type() == scanning::token_type::IDENTIFIER)
+	{
+
+	}
+
+	return nullptr;
 }
 
 parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::declspec()
@@ -215,7 +220,15 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 	chclang::parsing::variable_attributes attr{ 0 };
 	while (is_typename(current()))
 	{
-		if (match({ token_type::TYPEDEF, token_type::EXTERN, token_type::STATIC, token_type::AUTO }))
+		if (match({ token_type::TYPEDEF,
+					token_type::EXTERN,
+					token_type::STATIC,
+					token_type::AUTO,
+					token_type::INLINE,
+					token_type::THREADLOCAL,
+					token_type::CONST,
+					token_type::VOLATILE,
+					token_type::NORETURN }))
 		{
 			auto sc = previous();
 			switch (sc.token_type())
@@ -238,6 +251,17 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 			case token_type::THREADLOCAL:
 				attr.storage_class |= (1 << STORAGE_CLASS_THREAD_LOCAL_OFF);
 				break;
+			case token_type::CONST:
+				attr.is_const = true;
+				break;
+			case token_type::VOLATILE:
+				attr.is_volatile = true;
+				break;
+			case token_type::NORETURN:
+				attr.no_return = true;
+				break;
+			default:
+				assert(false);
 			}
 
 			if ((attr.storage_class & (1 << STORAGE_CLASS_TYPEDEF_OFF)) && (attr.storage_class & 0b11110))
@@ -246,13 +270,6 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 			}
 		}
 
-		if (match({ token_type::CONST, token_type::VOLATILE, token_type::AUTO,
-					token_type::NORETURN }))
-		{
-			// Do nothing now
-		}
-
-		
 	}
 
 }

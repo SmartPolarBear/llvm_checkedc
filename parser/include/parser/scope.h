@@ -11,41 +11,26 @@
 //
 
 //
-// Created by bear on 3/3/22.
+// Created by cleve on 4/10/2022.
 //
+
+#include <resolver/type.h>
+
+#include <parser/variable.h>
+
+#include <unordered_map>
+#include <string>
+#include <memory>
 
 #pragma once
 
-#include <llvm/IR/Value.h>
-
-#include <cctype>
-
 namespace chclang::parsing
 {
-
-enum storage_class_offs
-{
-	STORAGE_CLASS_TYPEDEF_OFF = 0,
-	STORAGE_CLASS_EXTERN_OFF,
-	STORAGE_CLASS_STATIC_OFF,
-	STORAGE_CLASS_AUTO_OFF,
-	STORAGE_CLASS_INLINE_OFF,
-	STORAGE_CLASS_THREAD_LOCAL_OFF
-};
-
-struct variable_attributes
-{
-	uint32_t storage_class;
-	size_t alignment;
-	bool is_const;
-	bool is_volatile;
-	bool no_return;
-};
-
-class expression
+class scope
 {
  public:
-	virtual llvm::Value* codegen() = 0;
-	virtual llvm::Type* type() = 0;
+ private:
+	std::unordered_map<std::string, std::shared_ptr<variable>> variables_{};
+	std::unordered_map<std::string, std::shared_ptr<resolving::type>> tags_{};
 };
 }

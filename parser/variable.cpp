@@ -11,41 +11,22 @@
 //
 
 //
-// Created by bear on 3/3/22.
+// Created by cleve on 4/10/2022.
 //
 
-#pragma once
+#include <parser/variable.h>
 
-#include <llvm/IR/Value.h>
-
-#include <cctype>
-
-namespace chclang::parsing
+chclang::parsing::variable_type chclang::parsing::typedef_variable::var_type()
 {
+	return variable_type::TYPEDEF;
+}
 
-enum storage_class_offs
+chclang::parsing::variable_type chclang::parsing::enum_variable::var_type()
 {
-	STORAGE_CLASS_TYPEDEF_OFF = 0,
-	STORAGE_CLASS_EXTERN_OFF,
-	STORAGE_CLASS_STATIC_OFF,
-	STORAGE_CLASS_AUTO_OFF,
-	STORAGE_CLASS_INLINE_OFF,
-	STORAGE_CLASS_THREAD_LOCAL_OFF
-};
+	return variable_type::ENUM;
+}
 
-struct variable_attributes
+chclang::parsing::variable_type chclang::parsing::object_variable::var_type()
 {
-	uint32_t storage_class;
-	size_t alignment;
-	bool is_const;
-	bool is_volatile;
-	bool no_return;
-};
-
-class expression
-{
- public:
-	virtual llvm::Value* codegen() = 0;
-	virtual llvm::Type* type() = 0;
-};
+	return variable_type::VARIABLE;
 }

@@ -11,41 +11,62 @@
 //
 
 //
-// Created by bear on 3/3/22.
+// Created by cleve on 4/10/2022.
 //
-
 #pragma once
 
-#include <llvm/IR/Value.h>
+#include <resolver/type.h>
 
-#include <cctype>
+#include <memory>
 
 namespace chclang::parsing
 {
-
-enum storage_class_offs
+enum class variable_type
 {
-	STORAGE_CLASS_TYPEDEF_OFF = 0,
-	STORAGE_CLASS_EXTERN_OFF,
-	STORAGE_CLASS_STATIC_OFF,
-	STORAGE_CLASS_AUTO_OFF,
-	STORAGE_CLASS_INLINE_OFF,
-	STORAGE_CLASS_THREAD_LOCAL_OFF
+	VARIABLE,
+	TYPEDEF,
+	ENUM,
 };
 
-struct variable_attributes
-{
-	uint32_t storage_class;
-	size_t alignment;
-	bool is_const;
-	bool is_volatile;
-	bool no_return;
-};
-
-class expression
+class variable
 {
  public:
-	virtual llvm::Value* codegen() = 0;
-	virtual llvm::Type* type() = 0;
+	virtual variable_type var_type() = 0;
+};
+
+class object_variable final
+	: public variable
+{
+ public:
+	variable_type var_type() override;
+};
+
+class enum_variable final
+	: public variable
+{
+ public:
+	variable_type var_type() override;
+
+	std::shared_ptr<resolving::type> type()
+	{
+		return type_;
+	}
+ public:
+	std::shared_ptr<resolving::type> type_{};
+	int64_t value_{};
+};
+
+class typedef_variable final
+	: public variable
+{
+ public:
+	variable_type var_type() override;
+
+	std::shared_ptr<resolving::type> type()
+	{
+		return type_;
+	}
+ private:
+	std::shared_ptr<resolving::type> type_{};
 };
 }
