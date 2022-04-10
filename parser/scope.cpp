@@ -15,3 +15,28 @@
 //
 
 #include <parser/scope.h>
+#include <resolver/type.h>
+
+using namespace chclang;
+
+using namespace std;
+
+bool chclang::parsing::scope::contains_variable(const std::string& key) const
+{
+	return variables_.contains(key);
+}
+
+std::shared_ptr<chclang::parsing::variable> chclang::parsing::scope::at_variable(const std::string& key)const
+{
+	return variables_.at(key);
+}
+
+bool chclang::parsing::scope::contains_tag(const std::string& key) const
+{
+	return tags_.contains(key);
+}
+
+std::shared_ptr<resolving::type> chclang::parsing::scope::at_tag(const std::string& key)const
+{
+	return tags_.at(key);
+}

@@ -25,6 +25,7 @@
 #include "scanner/token.h"
 
 #include "resolver/type.h"
+#include "scope.h"
 
 #include <vector>
 #include <tuple>
@@ -46,9 +47,9 @@ class parser
 
 	recoverable<std::shared_ptr<resolving::type>, variable_attributes> declspec();
 
-	bool is_typename(const scanning::token &tk);
+	bool is_typename(const scanning::token& tk);
 
-	std::shared_ptr<resolving::type> find_typedef(const scanning::token &tk);
+	std::shared_ptr<resolving::type> find_typedef(const scanning::token& tk);
 
 	// for error recovery
 	void synchronize();
@@ -75,8 +76,12 @@ class parser
 
 	[[nodiscard]] scanning::token previous();
 
+	std::shared_ptr<variable> find_variable(const scanning::token &tk);
+
 	std::vector<scanning::token> tokens_{};
 
 	gsl::index current_token_{};
+
+	base::iterable_stack<scope> scopes_{};
 };
 }

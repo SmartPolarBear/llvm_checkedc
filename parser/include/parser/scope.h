@@ -29,6 +29,14 @@ namespace chclang::parsing
 class scope
 {
  public:
+	bool contains_variable(const std::string& key) const;
+
+	std::shared_ptr<variable> at_variable(const std::string& key) const;
+
+	bool contains_tag(const std::string& key) const;
+
+	std::shared_ptr<resolving::type> at_tag(const std::string& key) const;
+
  private:
 	std::unordered_map<std::string, std::shared_ptr<variable>> variables_{};
 	std::unordered_map<std::string, std::shared_ptr<resolving::type>> tags_{};

@@ -193,9 +193,12 @@ std::shared_ptr<resolving::type> parser::find_typedef(const token& tk)
 {
 	if (tk.token_type() == scanning::token_type::IDENTIFIER)
 	{
-
+		auto var = find_variable(tk);
+		if (var && var->var_type() == variable_type::TYPEDEF)
+		{
+			return static_pointer_cast<typedef_variable>(var)->type();
+		}
 	}
-
 	return nullptr;
 }
 
@@ -272,6 +275,20 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 
 	}
 
+}
+
+std::shared_ptr<variable> parser::find_variable(const token& tk)
+{
+
+	for (const auto& scope : scopes_)
+	{
+		if (scope.contains_variable(tk.lexeme()))
+		{
+			return scope.at_variable(tk.lexeme());
+		}
+	}
+
+	return nullptr;
 }
 
 
