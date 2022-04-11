@@ -19,6 +19,9 @@
 #include "parser/parser.h"
 #include "parser/visitor.h"
 
+#include <resolver/type.h>
+#include <resolver/integral_type.h>
+
 #include <bitset>
 
 using namespace chclang;
@@ -160,8 +163,9 @@ scanning::token parser::current()
 	return tokens_[current_token_];
 }
 
-bool parser::is_typename(const token& tk)
+bool parser::is_current_typename()
 {
+	const auto& tk = current();
 	if (tk.lexeme() == "void" || tk.lexeme() == "_Bool" ||
 		tk.lexeme() == "bool" || tk.lexeme() == "char" ||
 		tk.lexeme() == "short" || tk.lexeme() == "int" ||
@@ -202,7 +206,7 @@ std::shared_ptr<resolving::type> parser::find_typedef(const token& tk)
 	return nullptr;
 }
 
-parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::declspec()
+parser::skip_ahead<shared_ptr<resolving::type>, variable_attributes> parser::declspec(bool allow_storage_specifier)
 {
 	// Use for counter for various combos of internal types
 	enum : uint32_t
@@ -221,8 +225,11 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 	};
 
 	chclang::parsing::variable_attributes attr{ 0 };
-	while (is_typename(current()))
+	std::shared_ptr<resolving::type> type{ resolving::int_type::make() }; // default int rule
+
+	while (is_current_typename())
 	{
+
 		if (match({ token_type::TYPEDEF,
 					token_type::EXTERN,
 					token_type::STATIC,
@@ -233,6 +240,11 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 					token_type::VOLATILE,
 					token_type::NORETURN }))
 		{
+			if (!allow_storage_specifier)
+			{
+				throw error(current(), "Storage specifier is not allowed in this context.");
+			}
+
 			auto sc = previous();
 			switch (sc.token_type())
 			{
@@ -269,17 +281,66 @@ parser::recoverable<shared_ptr<resolving::type>, variable_attributes> parser::de
 
 			if ((attr.storage_class & (1 << STORAGE_CLASS_TYPEDEF_OFF)) && (attr.storage_class & 0b11110))
 			{
-				error(previous(), "Redundant typedef specifier.");
+				throw error(previous(), "Redundant typedef specifier.");
 			}
+			continue;
 		}
 
+		if (match({ token_type::ATOMIC }))
+		{
+			if (match({ token_type::LEFT_PAREN }))
+			{
+				auto [t, next] = type_name();
+				type = t;
+				current_token_ = next;
+				consume(scanning::token_type::RIGHT_PAREN, "Unmatched '(' and ')'.");
+			}
+			else
+			{
+				auto [t, next] = type_name();
+				if (t)
+				{
+					type = t;
+					current_token_ = next;
+				}
+				else
+				{
+					throw error(previous(), fmt::format("Invalid type {} for _Atomic.", current().lexeme()));
+				}
+			}
+			continue;
+		}
+
+		if (match({ token_type::ALIGNAS }))
+		{
+			if (!allow_storage_specifier)
+			{
+				throw error(current(), "_Alignas is not allowed in this context.");
+			}
+
+			consume(scanning::token_type::LEFT_PAREN, "Alignment specifier is required.");
+
+			if (is_current_typename())
+			{
+				auto [t, next] = type_name();
+				attr.alignment = t->alignment();
+				current_token_ = next;
+			}
+			else
+			{
+				auto [align, next] = const_expr();
+				attr.alignment = align;
+				current_token_ = next;
+			}
+			continue;
+
+		}
 	}
 
 }
 
 std::shared_ptr<variable> parser::find_variable(const token& tk)
 {
-
 	for (const auto& scope : scopes_)
 	{
 		if (scope.contains_variable(tk.lexeme()))
@@ -289,6 +350,15 @@ std::shared_ptr<variable> parser::find_variable(const token& tk)
 	}
 
 	return nullptr;
+}
+parser::skip_ahead<shared_ptr<resolving::type>> parser::type_name()
+{
+	return chclang::parsing::parser::skip_ahead<shared_ptr<resolving::type>>();
+}
+
+parser::skip_ahead<int64_t> parser::const_expr()
+{
+	return chclang::parsing::parser::skip_ahead<int64_t>();
 }
 
 

@@ -38,16 +38,20 @@ class parser
 {
  public:
 	template<typename... T>
-	using recoverable = std::tuple<T..., gsl::index>;
+	using skip_ahead = std::tuple<T..., gsl::index>;
 
 	explicit parser(std::vector<scanning::token> tks);
 
 	std::vector<std::shared_ptr<statement>> parse();
  private:
 
-	recoverable<std::shared_ptr<resolving::type>, variable_attributes> declspec();
+	skip_ahead<std::shared_ptr<resolving::type>, variable_attributes> declspec(bool allow_storage_specifier = false);
 
-	bool is_typename(const scanning::token& tk);
+	skip_ahead<std::shared_ptr<resolving::type>> type_name();
+
+	skip_ahead<int64_t> const_expr();
+
+	bool is_current_typename();
 
 	std::shared_ptr<resolving::type> find_typedef(const scanning::token& tk);
 
@@ -76,7 +80,7 @@ class parser
 
 	[[nodiscard]] scanning::token previous();
 
-	std::shared_ptr<variable> find_variable(const scanning::token &tk);
+	std::shared_ptr<variable> find_variable(const scanning::token& tk);
 
 	std::vector<scanning::token> tokens_{};
 
