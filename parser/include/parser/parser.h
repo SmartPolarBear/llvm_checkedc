@@ -51,7 +51,7 @@ class parser
 
 	skip_ahead<int64_t> const_expr();
 
-	bool is_current_typename();
+	bool is_typename(const scanning::token& t);
 
 	std::shared_ptr<resolving::type> find_typedef(const scanning::token& tk);
 

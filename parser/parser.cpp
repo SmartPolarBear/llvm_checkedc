@@ -163,7 +163,7 @@ scanning::token parser::current()
 	return tokens_[current_token_];
 }
 
-bool parser::is_current_typename()
+bool parser::is_typename(const scanning::token& t)
 {
 	const auto& tk = current();
 	if (tk.lexeme() == "void" || tk.lexeme() == "_Bool" ||
@@ -225,9 +225,10 @@ parser::skip_ahead<shared_ptr<resolving::type>, variable_attributes> parser::dec
 	};
 
 	chclang::parsing::variable_attributes attr{ 0 };
+	uint64_t type_counter{ 0 };
 	std::shared_ptr<resolving::type> type{ resolving::int_type::make() }; // default int rule
 
-	while (is_current_typename())
+	while (is_typename(current()))
 	{
 
 		if (match({ token_type::TYPEDEF,
@@ -320,7 +321,7 @@ parser::skip_ahead<shared_ptr<resolving::type>, variable_attributes> parser::dec
 
 			consume(scanning::token_type::LEFT_PAREN, "Alignment specifier is required.");
 
-			if (is_current_typename())
+			if (is_typename(current()))
 			{
 				auto [t, next] = type_name();
 				attr.alignment = t->alignment();
@@ -333,6 +334,24 @@ parser::skip_ahead<shared_ptr<resolving::type>, variable_attributes> parser::dec
 				current_token_ = next;
 			}
 			continue;
+
+		}
+
+		// user defined type
+		auto userdef_type = find_typedef(current());
+		if (match({ token_type::STRUCT, token_type::UNION, token_type::ENUM }) || userdef_type)
+		{
+			if (type_counter)
+			{
+				current_token_--;
+				break;
+			}
+			// TODO
+		}
+
+		// built-in types
+		if (match({ token_type::VOID }))
+		{
 
 		}
 	}
